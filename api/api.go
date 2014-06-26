@@ -6,7 +6,7 @@ package api
 import (
 	"os"
 
-	"github.com/Bowery/SkyLab/cli/db"
+	"github.com/Bowery/cli/db"
 )
 
 var (

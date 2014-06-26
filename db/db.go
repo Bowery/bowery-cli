@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Bowery/SkyLab/cli/errors"
+	"github.com/Bowery/cli/errors"
 )
 
 // jumpToParent looks for a path up 5 directories and changes to the directory

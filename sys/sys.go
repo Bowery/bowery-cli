@@ -6,7 +6,7 @@ package sys
 import (
 	"os/exec"
 
-	"github.com/Bowery/SkyLab/cli/errors"
+	"github.com/Bowery/cli/errors"
 )
 
 // OpenPath opens a path using the systems preferred application.

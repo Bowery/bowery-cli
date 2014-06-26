@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Bowery/SkyLab/cli/errors"
-	"github.com/Bowery/SkyLab/cli/log"
+	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/cli/log"
 )
 
 // Basic gets input and if required tests to ensure input was given.

@@ -4,11 +4,11 @@ package cmds
 import (
 	"strings"
 
-	"github.com/Bowery/SkyLab/cli/db"
-	"github.com/Bowery/SkyLab/cli/errors"
-	"github.com/Bowery/SkyLab/cli/keen"
-	"github.com/Bowery/SkyLab/cli/log"
-	"github.com/Bowery/SkyLab/cli/rollbar"
+	"github.com/Bowery/cli/db"
+	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/cli/keen"
+	"github.com/Bowery/cli/log"
+	"github.com/Bowery/cli/rollbar"
 )
 
 func init() {

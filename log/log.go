@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Bowery/SkyLab/cli/api"
-	"github.com/Bowery/SkyLab/cli/db"
+	"github.com/Bowery/cli/api"
+	"github.com/Bowery/cli/db"
 
 	redigo "github.com/garyburd/redigo/redis"
 )

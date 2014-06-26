@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/Bowery/SkyLab/cli/errors"
+	"github.com/Bowery/cli/errors"
 )
 
 const (

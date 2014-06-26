@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Bowery/SkyLab/cli/errors"
+	"github.com/Bowery/cli/errors"
 )
 
 // Service describes a service.

@@ -18,11 +18,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Bowery/SkyLab/cli/api"
-	"github.com/Bowery/SkyLab/cli/db"
-	"github.com/Bowery/SkyLab/cli/errors"
-	"github.com/Bowery/SkyLab/cli/log"
-	"github.com/Bowery/SkyLab/cli/schemas"
+	"github.com/Bowery/cli/api"
+	"github.com/Bowery/cli/db"
+	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/cli/log"
+	"github.com/Bowery/cli/schemas"
 )
 
 // GetTokenByLogin creates a token for the given devs email.

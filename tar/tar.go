@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Bowery/SkyLab/cli/db"
+	"github.com/Bowery/cli/db"
 )
 
 // Tar reads the given dir and writes contents to a tar stream.

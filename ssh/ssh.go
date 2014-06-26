@@ -9,10 +9,10 @@ import (
 
 	"code.google.com/p/go.crypto/ssh"
 	"code.google.com/p/go.crypto/ssh/terminal"
-	"github.com/Bowery/SkyLab/cli/errors"
-	"github.com/Bowery/SkyLab/cli/log"
-	"github.com/Bowery/SkyLab/cli/prompt"
-	"github.com/Bowery/SkyLab/cli/schemas"
+	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/cli/log"
+	"github.com/Bowery/cli/prompt"
+	"github.com/Bowery/cli/schemas"
 )
 
 // Shell opens a shell connection on the servives ssh address.

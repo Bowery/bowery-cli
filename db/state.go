@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Bowery/SkyLab/cli/errors"
-	"github.com/Bowery/SkyLab/cli/schemas"
+	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/cli/schemas"
 )
 
 // State describes a bowery applications saved state.

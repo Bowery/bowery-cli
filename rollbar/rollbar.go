@@ -11,10 +11,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Bowery/SkyLab/cli/db"
-	"github.com/Bowery/SkyLab/cli/errors"
-	"github.com/Bowery/SkyLab/cli/log"
-	"github.com/Bowery/SkyLab/cli/version"
+	"github.com/Bowery/cli/db"
+	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/cli/log"
+	"github.com/Bowery/cli/version"
 )
 
 var debug = os.Getenv("DEBUG")

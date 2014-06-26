@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Bowery/SkyLab/cli/api"
-	"github.com/Bowery/SkyLab/cli/db"
-	"github.com/Bowery/SkyLab/cli/schemas"
+	"github.com/Bowery/cli/api"
+	"github.com/Bowery/cli/db"
+	"github.com/Bowery/cli/schemas"
 )
 
 var TestDeveloper = &schemas.Developer{
