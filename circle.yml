@@ -1,5 +1,5 @@
-dependencies:
-  override:
+checkout:
+  post:
     - go get github.com/Bowery/gopackages
 test:
   override:
