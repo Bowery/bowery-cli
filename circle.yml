@@ -1,3 +1,6 @@
+dependencies:
+  override:
+    - echo ""
 test:
   override:
     - mkdir -p /home/ubuntu/.go_workspace/src/github.com/Bowery
