@@ -1,3 +1,7 @@
+dependencies:
+  pre:
+    - pip install fabric
+    - pip install requests
 test:
   override:
     - mkdir -p /home/ubuntu/.go_workspace/src/github.com/Bowery
