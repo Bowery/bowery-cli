@@ -12,13 +12,13 @@ import (
 
 	"github.com/Bowery/cli/db"
 	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/keen"
 	"github.com/Bowery/cli/log"
 	"github.com/Bowery/cli/prompt"
 	"github.com/Bowery/cli/requests"
 	"github.com/Bowery/cli/rollbar"
 	"github.com/Bowery/cli/schemas"
 	"github.com/Bowery/cli/tar"
+	"github.com/Bowery/gopackages/keen"
 
 	"labix.org/v2/mgo/bson"
 )

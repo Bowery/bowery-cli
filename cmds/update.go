@@ -8,11 +8,11 @@ import (
 
 	"bitbucket.org/kardianos/osext"
 	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/keen"
 	"github.com/Bowery/cli/log"
 	"github.com/Bowery/cli/requests"
 	"github.com/Bowery/cli/rollbar"
 	"github.com/Bowery/cli/version"
+	"github.com/Bowery/gopackages/keen"
 )
 
 func init() {

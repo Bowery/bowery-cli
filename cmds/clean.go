@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/keen"
 	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/gopackages/keen"
 )
 
 func init() {

@@ -7,10 +7,10 @@ import (
 	"os"
 
 	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/keen"
 	"github.com/Bowery/cli/log"
 	"github.com/Bowery/cli/prompt"
 	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/gopackages/keen"
 )
 
 func init() {

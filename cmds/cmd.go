@@ -3,8 +3,8 @@
 package cmds
 
 import (
-	"github.com/Bowery/cli/keen"
 	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/gopackages/keen"
 )
 
 // Cmds are a map of commands by name.

@@ -7,9 +7,9 @@ import (
 
 	"github.com/Bowery/cli/db"
 	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/keen"
 	"github.com/Bowery/cli/prompt"
 	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/gopackages/keen"
 )
 
 func init() {

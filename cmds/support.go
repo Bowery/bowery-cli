@@ -2,9 +2,9 @@
 package cmds
 
 import (
-	"github.com/Bowery/cli/keen"
 	"github.com/Bowery/cli/rollbar"
 	"github.com/Bowery/cli/sys"
+	"github.com/Bowery/gopackages/keen"
 )
 
 func init() {
