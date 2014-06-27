@@ -1,8 +1,8 @@
 dependencies:
   override:
-    - echo ""
+    - go get github.com/Bowery/gopackages
 test:
   override:
     - mkdir -p /home/ubuntu/.go_workspace/src/github.com/Bowery
     - cp -r /home/ubuntu/cli /home/ubuntu/.go_workspace/src/github.com/Bowery/cli
-    - cd /home/ubuntu/.go_workspace/src/github.com/Bowery/cli && go get && go test ./...
+    - cd /home/ubuntu/.go_workspace/src/github.com/Bowery/cli && go test ./...
