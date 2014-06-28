@@ -1,4 +1,4 @@
-checkout:
+dependencies:
   override:
     - echo ""
 test:
