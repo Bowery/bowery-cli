@@ -18,10 +18,10 @@ import (
 	"github.com/Bowery/cli/log"
 	"github.com/Bowery/cli/requests"
 	"github.com/Bowery/cli/rollbar"
-	"github.com/Bowery/cli/schemas"
 	"github.com/Bowery/cli/sync"
 	"github.com/Bowery/cli/version"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/schemas"
 
 	"github.com/garyburd/redigo/redis"
 )

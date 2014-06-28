@@ -14,8 +14,8 @@ import (
 	"github.com/Bowery/cli/errors"
 	"github.com/Bowery/cli/log"
 	"github.com/Bowery/cli/requests"
-	"github.com/Bowery/cli/schemas"
 	"github.com/Bowery/cli/tar"
+	"github.com/Bowery/gopackages/schemas"
 )
 
 // Event describes a file event and the associated service name.

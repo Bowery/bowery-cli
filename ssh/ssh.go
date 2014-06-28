@@ -12,7 +12,7 @@ import (
 	"github.com/Bowery/cli/errors"
 	"github.com/Bowery/cli/log"
 	"github.com/Bowery/cli/prompt"
-	"github.com/Bowery/cli/schemas"
+	"github.com/Bowery/gopackages/schemas"
 )
 
 // Shell opens a shell connection on the servives ssh address.

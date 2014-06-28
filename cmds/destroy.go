@@ -12,8 +12,8 @@ import (
 	"github.com/Bowery/cli/prompt"
 	"github.com/Bowery/cli/requests"
 	"github.com/Bowery/cli/rollbar"
-	"github.com/Bowery/cli/schemas"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/schemas"
 
 	"labix.org/v2/mgo/bson"
 )

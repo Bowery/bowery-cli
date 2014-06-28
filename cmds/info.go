@@ -9,8 +9,8 @@ import (
 	"github.com/Bowery/cli/errors"
 	"github.com/Bowery/cli/log"
 	"github.com/Bowery/cli/rollbar"
-	"github.com/Bowery/cli/schemas"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/schemas"
 )
 
 func init() {

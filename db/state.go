@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/schemas"
+	"github.com/Bowery/gopackages/schemas"
 )
 
 // State describes a bowery applications saved state.
