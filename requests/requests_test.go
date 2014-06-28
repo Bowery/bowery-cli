@@ -11,7 +11,7 @@ import (
 
 	"github.com/Bowery/cli/api"
 	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/schemas"
+	"github.com/Bowery/gopackages/schemas"
 )
 
 var TestDeveloper = &schemas.Developer{

@@ -3,7 +3,7 @@ package requests
 
 import (
 	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/schemas"
+	"github.com/Bowery/gopackages/schemas"
 )
 
 // TokenReq is a generic request containing only a developer token.
