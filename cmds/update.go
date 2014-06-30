@@ -47,8 +47,16 @@ func updateRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 	tempExec := filepath.Join(filepath.Dir(exec), ".old_bowery"+filepath.Ext(exec))
 
+	// Open exec, should fail if execing somewhere else.
+	file, err := os.Open(exec)
+	if err != nil {
+		rollbar.Report(errors.ErrUpdatePerm)
+		return 1
+	}
+	file.Close()
+
 	// Create the temp exec file to test io permissions.
-	file, err := os.Create(tempExec)
+	file, err = os.Create(tempExec)
 	if err != nil {
 		rollbar.Report(errors.ErrUpdatePerm)
 		return 1
