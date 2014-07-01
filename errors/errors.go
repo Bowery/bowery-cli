@@ -16,7 +16,7 @@ import (
 var (
 	ErrNoDeveloper      = errors.New("No developer found. Run `bowery connect`. Error Code: 0")
 	ErrDeveloperExists  = errors.New("Developer with email already exists. Error Code: 1")
-	ErrContactSupport   = errors.New("Contact support. Run `bowery support`.")
+	ErrContactSupport   = errors.New("Contact support with the message below. Run `bowery support`.")
 	ErrNotConnected     = errors.New("You're not connected. Run `bowery connect`. Error Code: 2")
 	ErrEmpty            = errors.New("may not be empty.")
 	ErrInvalidCommand   = errors.New("Invalid command. Error Code: 3")
