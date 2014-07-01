@@ -246,15 +246,19 @@ func initiateSync(state *db.State) (*sync.Syncer, error) {
 		log.Println("magenta", "Service", service.Name, "is available at:")
 
 		url := "80: " + service.PublicAddr
+		appIdentifier := state.App.ID
+		if state.App.Name != "" {
+			appIdentifier = state.App.Name
+		}
 		if ENV != "development" {
-			url = service.Name + "." + state.App.ID + ".boweryapps.com"
+			url = service.Name + "." + appIdentifier + ".boweryapps.com"
 		}
 		log.Println("magenta", " ", url)
 
 		for port, addr := range service.CustomPorts {
 			url = port + ": " + addr
 			if ENV != "development" {
-				url = port + "." + service.Name + "." + state.App.ID + ".boweryapps.com"
+				url = port + "." + service.Name + "." + appIdentifier + ".boweryapps.com"
 			}
 
 			log.Println("magenta", " ", url)
