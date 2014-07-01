@@ -57,6 +57,9 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	if err == errors.ErrNotConnected {
 		log.Println("yellow", "  No connected application in this directory.")
 	} else {
+		if state.App.Name != "" {
+			log.Println("", "  Name:", state.App.Name)
+		}
 		log.Println("", "  ID:", state.App.ID)
 
 		for name, service := range state.Config {
@@ -71,7 +74,11 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 
 			url := apiService.PublicAddr
 			if ENV != "development" {
-				url = "http://" + name + "." + state.App.ID + ".boweryapps.com"
+				if state.App.Name != "" {
+					url = "http://" + name + "." + state.App.Name + ".boweryapps.com"
+				} else {
+					url = "http://" + name + "." + state.App.ID + ".boweryapps.com"
+				}
 			}
 
 			log.Println("", "  "+name+":")

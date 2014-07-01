@@ -13,13 +13,10 @@ import (
 	"github.com/Bowery/cli/requests"
 	"github.com/Bowery/cli/rollbar"
 	"github.com/Bowery/gopackages/keen"
-	"github.com/Bowery/gopackages/schemas"
-
-	"labix.org/v2/mgo/bson"
 )
 
 func init() {
-	Cmds["destroy"] = &Cmd{destroyRun, "destroy <id>", "Destroy an application and it's services.", ""}
+	Cmds["destroy"] = &Cmd{destroyRun, "destroy <id or name>", "Destroy an application and it's services.", ""}
 }
 
 func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
@@ -44,18 +41,12 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	}
 
 	// Fetch app.
-	var app *schemas.Application
 	appID := args[0]
-	if isObjId := bson.IsObjectIdHex(appID); isObjId == true {
-		log.Debug("Getting app with id:", appID)
-		app, err = requests.GetAppById(appID)
-		if err != nil {
-			rollbar.Report(err)
-			return 1
-		}
-	} else {
-		log.Println("yellow", "A valid app id is required.")
-		return 0
+	log.Debug("Getting app with id:", appID)
+	app, err := requests.GetAppById(appID)
+	if err != nil {
+		rollbar.Report(err)
+		return 1
 	}
 
 	log.Debug("Found app successfully:", app.ID)
@@ -92,7 +83,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 
 	// Send delete requests.
 	log.Println("yellow", "Attempting to remove application...")
-	if err := requests.DestroyAppByID(appID, dev.Token); err != nil {
+	if err := requests.DestroyAppByID(app.ID, dev.Token); err != nil {
 		rollbar.Report(err)
 		return 1
 	}

@@ -19,12 +19,10 @@ import (
 	"github.com/Bowery/cli/tar"
 	"github.com/Bowery/gopackages/keen"
 	"github.com/Bowery/gopackages/schemas"
-
-	"labix.org/v2/mgo/bson"
 )
 
 func init() {
-	Cmds["pull"] = &Cmd{pullRun, "pull [id]", "Pull down an application and it's code.", ""}
+	Cmds["pull"] = &Cmd{pullRun, "pull [id or name]", "Pull down an application and it's code.", ""}
 }
 
 func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
@@ -78,16 +76,11 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 
 	// Get app
 	if !inAppDir {
-		if isObjId := bson.IsObjectIdHex(args[0]); isObjId == true {
-			log.Debug("Getting app with id:", args[0])
-			app, err = requests.GetAppById(args[0])
-			if err != nil {
-				rollbar.Report(err)
-				return 1
-			}
-		} else {
-			log.Println("yellow", "A valid app id is required.")
-			return 0
+		log.Debug("Getting app with id:", args[0])
+		app, err = requests.GetAppById(args[0])
+		if err != nil {
+			rollbar.Report(err)
+			return 1
 		}
 	}
 
