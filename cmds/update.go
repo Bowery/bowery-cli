@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	Cmds["update"] = &Cmd{updateRun, "update", "Update bowery.", ""}
+	Cmds["update"] = &Cmd{updateRun, "update", "Update Bowery.", ""}
 }
 
 func updateRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

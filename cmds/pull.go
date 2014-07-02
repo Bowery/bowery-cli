@@ -22,7 +22,7 @@ import (
 )
 
 func init() {
-	Cmds["pull"] = &Cmd{pullRun, "pull [id or name]", "Pull down an application and it's code.", ""}
+	Cmds["pull"] = &Cmd{pullRun, "pull [id or name]", "Pull down an application and its code.", ""}
 }
 
 func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

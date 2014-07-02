@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	Cmds["login"] = &Cmd{loginRun, "login", "Login in to your Bowery account.", ""}
+	Cmds["login"] = &Cmd{loginRun, "login", "Login to your Bowery account.", ""}
 }
 
 func loginRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
