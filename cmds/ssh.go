@@ -20,7 +20,6 @@ func init() {
 }
 
 func sshRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	var service *schemas.Service
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
 			"Usage: bowery "+Cmds["ssh"].Usage, "\n\n"+Cmds["ssh"].Short)
@@ -34,6 +33,7 @@ func sshRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 
 	// Create slices of service names, and find the requested service.
+	var service *schemas.Service
 	services := make([]string, len(state.App.Services))
 	for i, v := range state.App.Services {
 		services[i] = v.Name
@@ -47,9 +47,8 @@ func sshRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		log.Fprintln(os.Stderr, "red", errors.ErrInvalidService, args[0])
 		log.Println("yellow", "Valid services:", strings.Join(services, ", "))
 		return 1
-	} else {
-		log.Debug("Found service", service.Name, "ssh addr:", service.SSHAddr)
 	}
+	log.Debug("Found service", service.Name, "ssh addr:", service.SSHAddr)
 
 	err = ssh.Shell(state.App, service)
 	if err != nil {

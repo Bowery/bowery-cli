@@ -63,7 +63,6 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		log.Println("", "  ID:", state.App.ID)
 
 		for name, service := range state.Config {
-			// Get the associated api.Service from the app service list.
 			var apiService *schemas.Service
 			for _, serv := range state.App.Services {
 				if serv.Name == name {
@@ -91,13 +90,13 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 				log.Println("", fmt.Sprintf("    Ports: %v", service.Ports))
 			}
 			if service.Build != "" {
-				log.Println("", "    Build", service.Build)
+				log.Println("", "    Build:", service.Build)
 			}
 			if service.Test != "" {
-				log.Println("", "    Test", service.Test)
+				log.Println("", "    Test:", service.Test)
 			}
 			if service.Start != "" {
-				log.Println("", "    Start", service.Start)
+				log.Println("", "    Start:", service.Start)
 			}
 		}
 	}
@@ -106,6 +105,5 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		"user": dev,
 		"app":  state,
 	})
-
 	return 0
 }

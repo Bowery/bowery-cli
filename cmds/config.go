@@ -24,8 +24,7 @@ func init() {
 
 func configRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	var err error
-
-	if len(args) < 1 {
+	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
 			"Usage: bowery", Cmds["config"].Usage, "\n\n"+Cmds["config"].Short)
 		return 2
@@ -70,6 +69,6 @@ func configRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	keen.AddEvent("bowery config", map[string]string{})
+	keen.AddEvent("bowery config", map[string]*db.Developer{"user": dev})
 	return 0
 }

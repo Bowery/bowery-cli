@@ -688,6 +688,34 @@ func SatelliteUpdate(url, serviceName, fullPath, name, status string) error {
 	return errors.NewStackError(uploadRes)
 }
 
+// SatelliteDownload retrieves the contents of a service.
+func SatelliteDownload(url string) (io.Reader, error) {
+	var buf bytes.Buffer
+	res, err := http.Get("http://" + url)
+	if err != nil {
+		return nil, errors.NewStackError(err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		downloadRes := new(Res)
+		decoder := json.NewDecoder(res.Body)
+		err = decoder.Decode(downloadRes)
+		if err != nil {
+			return nil, errors.NewStackError(err)
+		}
+
+		return nil, errors.NewStackError(downloadRes)
+	}
+
+	_, err = io.Copy(&buf, res.Body)
+	if err != nil {
+		return nil, errors.NewStackError(err)
+	}
+
+	return &buf, nil
+}
+
 // DownloadNewVersion retrieves the version of bowery requested for the
 // current os/arch.
 func DownloadNewVersion(version string) (io.Reader, error) {

@@ -33,7 +33,6 @@ func removeRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 
 	for _, name := range args {
-
 		_, ok := services.Data[name]
 		if !ok {
 			log.Println("yellow", "Service", name, "doesn't exist, skipping.")
@@ -66,6 +65,5 @@ func removeRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		"toRemove": args,
 		"existing": services.Data,
 	})
-
 	return 0
 }

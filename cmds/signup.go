@@ -49,7 +49,6 @@ func signupRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 			log.Println("yellow", "Try again! Valid email address required.")
 		}
 	}
-
 	log.Debug("Collected email", email)
 
 	pass, err := prompt.Password("Password")
