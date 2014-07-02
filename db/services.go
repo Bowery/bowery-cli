@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/bowery/errors"
 )
 
 // Service describes a service.

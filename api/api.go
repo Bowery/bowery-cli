@@ -6,7 +6,7 @@ package api
 import (
 	"os"
 
-	"github.com/Bowery/cli/db"
+	"github.com/Bowery/bowery/db"
 )
 
 var (

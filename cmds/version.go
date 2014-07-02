@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/rollbar"
-	"github.com/Bowery/cli/version"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/rollbar"
+	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/keen"
 )
 

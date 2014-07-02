@@ -11,10 +11,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/version"
+	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/version"
 )
 
 var debug = os.Getenv("DEBUG")

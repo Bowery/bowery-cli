@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/log"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
 )
 
 // Basic gets input and if required tests to ensure input was given.

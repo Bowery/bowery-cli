@@ -2,7 +2,7 @@
 package requests
 
 import (
-	"github.com/Bowery/cli/db"
+	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/gopackages/schemas"
 )
 
