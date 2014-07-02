@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	Cmds["clean"] = &Cmd{cleanRun, "clean", "Reset your apps environment.", ""}
+	Cmds["clean"] = &Cmd{cleanRun, "clean", "Reset your app's environment.", ""}
 }
 
 func cleanRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

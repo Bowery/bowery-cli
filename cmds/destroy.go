@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	Cmds["destroy"] = &Cmd{destroyRun, "destroy <id or name>", "Destroy an application and it's services.", ""}
+	Cmds["destroy"] = &Cmd{destroyRun, "destroy <id or name>", "Destroy an application and its services.", ""}
 }
 
 func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
