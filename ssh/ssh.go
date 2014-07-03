@@ -9,9 +9,9 @@ import (
 
 	"code.google.com/p/go.crypto/ssh"
 	"code.google.com/p/go.crypto/ssh/terminal"
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/prompt"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/prompt"
 	"github.com/Bowery/gopackages/schemas"
 )
 

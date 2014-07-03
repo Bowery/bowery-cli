@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/sys"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/sys"
 	"github.com/Bowery/gopackages/schemas"
 )
 

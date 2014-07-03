@@ -8,9 +8,9 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
 

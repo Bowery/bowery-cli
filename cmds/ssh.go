@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/rollbar"
-	"github.com/Bowery/cli/ssh"
+	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/rollbar"
+	"github.com/Bowery/bowery/ssh"
 	"github.com/Bowery/gopackages/keen"
 	"github.com/Bowery/gopackages/schemas"
 )

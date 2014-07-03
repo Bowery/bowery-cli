@@ -2,9 +2,9 @@
 package cmds
 
 import (
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/requests"
-	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/requests"
+	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
 

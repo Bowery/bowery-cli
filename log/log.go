@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Bowery/cli/api"
-	"github.com/Bowery/cli/db"
+	"github.com/Bowery/bowery/api"
+	"github.com/Bowery/bowery/db"
 
 	redigo "github.com/garyburd/redigo/redis"
 )

@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/requests"
-	"github.com/Bowery/cli/tar"
+	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/requests"
+	"github.com/Bowery/bowery/tar"
 	"github.com/Bowery/gopackages/schemas"
 )
 

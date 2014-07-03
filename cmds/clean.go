@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
 

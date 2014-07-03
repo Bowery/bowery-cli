@@ -18,10 +18,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Bowery/cli/api"
-	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/errors"
-	"github.com/Bowery/cli/log"
+	"github.com/Bowery/bowery/api"
+	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/gopackages/schemas"
 )
 

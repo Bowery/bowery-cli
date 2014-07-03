@@ -3,7 +3,7 @@
 package cmds
 
 import (
-	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
 

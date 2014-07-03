@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/Bowery/cli/errors"
+	"github.com/Bowery/bowery/errors"
 )
 
 var inReader *bufio.Reader

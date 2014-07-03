@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Bowery/cli/db"
-	"github.com/Bowery/cli/log"
-	"github.com/Bowery/cli/prompt"
-	"github.com/Bowery/cli/rollbar"
+	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/prompt"
+	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
 
