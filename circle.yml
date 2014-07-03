@@ -5,5 +5,5 @@ test:
   override:
     - mkdir -p /home/ubuntu/.go_workspace/src/github.com/Bowery
     - git clone git@github.com:Bowery/gopackages /home/ubuntu/.go_workspace/src/github.com/Bowery/gopackages
-    - cp -r /home/ubuntu/cli /home/ubuntu/.go_workspace/src/github.com/Bowery/bowery
+    - cp -r /home/ubuntu/bowery /home/ubuntu/.go_workspace/src/github.com/Bowery/bowery
     - cd /home/ubuntu/.go_workspace/src/github.com/Bowery/bowery && go get && go test ./...
