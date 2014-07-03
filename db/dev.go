@@ -8,6 +8,7 @@ import (
 
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/sys"
+	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/schemas"
 )
 
@@ -41,5 +42,9 @@ func GetDeveloper() (*Developer, error) {
 
 // Save writes the developer to their db path.
 func (dev *Developer) Save() error {
+	if dev.Developer != nil {
+		dev.Developer.Version = version.Version
+	}
+
 	return save(dev, dev.path)
 }
