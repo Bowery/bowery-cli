@@ -38,7 +38,7 @@ const (
 	RestartPath            = "/services/{dockerid}/restart?token={token}"
 	SavePath               = "/services/{appid}/save"
 	RemovePath             = "/services/{dockerid}/remove?token={token}"
-	DownloadPath           = "http://download.bowery.io/downloads/bowery_{version}_{os}_{arch}.zip"
+	DownloadPath           = "http://dl.bintray.com/bowery/bowery/{version}_{os}_{arch}.zip"
 	BoweryImagesSearchPath = "/images/search/{name}"
 	BoweryImagesCheckPath  = "/images/{name}"
 )
