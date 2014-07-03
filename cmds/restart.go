@@ -20,8 +20,6 @@ func init() {
 }
 
 func restartRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	var service *schemas.Service
-
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
 			"Usage: bowery "+Cmds["restart"].Usage, "\n\n"+Cmds["restart"].Short)
@@ -57,6 +55,7 @@ func restartRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	}
 
 	// Create slices of service names, and find the requested service.
+	var service *schemas.Service
 	services := make([]string, len(state.App.Services))
 	serviceIdx := -1
 	for i, v := range state.App.Services {
@@ -97,6 +96,5 @@ func restartRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		"name":  service.Name,
 		"appId": state.App.ID,
 	})
-
 	return 0
 }

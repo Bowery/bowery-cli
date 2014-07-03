@@ -21,7 +21,6 @@ func init() {
 }
 
 func saveRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	var service *schemas.Service
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
 			"Usage: bowery "+Cmds["save"].Usage, "\n\n"+Cmds["save"].Short)
@@ -41,6 +40,7 @@ func saveRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 
 	// Create slices of service names, and find the requested service.
+	var service *schemas.Service
 	services := make([]string, len(state.App.Services))
 	for i, v := range state.App.Services {
 		services[i] = v.Name
@@ -97,6 +97,5 @@ func saveRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		"imageName":   imageName,
 		"appId":       state.App.ID,
 	})
-
 	return 0
 }

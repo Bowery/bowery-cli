@@ -19,7 +19,7 @@ func init() {
 }
 
 func errorsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	if len(args) == 0 {
+	if len(args) <= 0 {
 		log.Println("cyan", "All Errors. Run `bowery errors <code>` for more info.\n")
 		tabWriter := tabwriter.NewWriter(os.Stderr, 0, 0, 1, ' ', 0)
 		for i, err := range errors.GetAll() {

@@ -21,10 +21,9 @@ func init() {
 
 func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	force := flag.Lookup("force").Value.String()
-
-	if len(args) != 1 {
+	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
-			"Usage: bowery "+Cmds["destroy"].Usage, "\n\n"+Cmds["destroy"].Description)
+			"Usage: bowery "+Cmds["destroy"].Usage, "\n\n"+Cmds["destroy"].Short)
 		return 2 // --help uses 2.
 	}
 
@@ -37,18 +36,16 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 
 	if dev.Token == "" {
 		log.Println("yellow", "Oops! You must be logged in to perform this action.")
-		return 0
+		return 1
 	}
 
 	// Fetch app.
-	appID := args[0]
-	log.Debug("Getting app with id:", appID)
-	app, err := requests.GetAppById(appID)
+	log.Debug("Getting app with id:", args[0])
+	app, err := requests.GetAppById(args[0])
 	if err != nil {
 		rollbar.Report(err)
 		return 1
 	}
-
 	log.Debug("Found app successfully:", app.ID)
 
 	// Make sure developer owns app.
@@ -56,7 +53,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		log.Debug("Current developer owns application.")
 	} else {
 		log.Println("yellow", "You must be the owner of this application to perform this action.")
-		return 0
+		return 1
 	}
 
 	// Ask for confirmation to delete.
@@ -104,7 +101,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		}
 	}
 
+	keen.AddEvent("bowery destroy", app)
 	log.Println("yellow", "Application removed sucessfully.")
-
 	return 0
 }

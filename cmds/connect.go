@@ -5,11 +5,10 @@ import (
 	"bytes"
 	"io"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"runtime"
 	"strings"
+	mutex "sync"
 	"time"
 
 	"github.com/Bowery/bowery/api"
@@ -36,12 +35,6 @@ func init() {
 }
 
 func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	// Set the ulimit on Darwin.
-	if runtime.GOOS == "darwin" {
-		cmd := exec.Command("ulimit", "-Hn", "65535")
-		cmd.Run()
-	}
-
 	// Create and register signals.
 	signals := make(chan os.Signal, 1)
 	done := make(chan int, 1)
@@ -95,12 +88,9 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		rollbar.Report(err)
 		return 1
 	}
+	defer requests.Disconnect(dev.Token)
 
 	syncer, err := initiateSync(state)
-	if syncer != nil {
-		defer syncer.Close()
-	}
-
 	if err != nil {
 		if err == errors.ErrNoServicePaths {
 			log.Println("yellow", "Your services have been successfully created.")
@@ -111,20 +101,18 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		rollbar.Report(err)
 		return 1
 	}
+	defer syncer.Close()
 
 	logChan := make(chan redis.Conn, 1)
 	logFile, err := tailLogs(state, logChan)
-	if logFile != nil {
-		defer logFile.Close()
-	}
 	if err != nil {
 		rollbar.Report(err)
 		return 1
 	}
+	defer logFile.Close()
 
 	go func() {
 		<-signals
-		requests.Disconnect(dev.Token)
 		done <- 0
 	}()
 
@@ -268,25 +256,21 @@ func initiateSync(state *db.State) (*sync.Syncer, error) {
 	// Get the service addrs that need syncing.
 	for _, service := range state.App.Services {
 		config := state.Config[service.Name]
-		// Even if no path is given, ensure container is up
-		i := 0
 
+		// Ensure the container is running.
 		var err error
-
-		// Attempt to connect.
+		i := 0
 		for i < 1000 {
-			<-time.After(8 * time.Millisecond)
 			err = requests.SatelliteCheckHealth(service.SatelliteAddr)
-
 			if err == nil {
 				break
 			}
 
 			i++
+			<-time.After(8 * time.Millisecond)
 		}
-
 		if err != nil {
-			return nil, errors.ErrContainerConnect
+			return nil, errors.NewStackError(errors.ErrContainerConnect)
 		}
 
 		// No reason to sync if no path is given.
@@ -334,7 +318,8 @@ func initiateSync(state *db.State) (*sync.Syncer, error) {
 
 			err := syncer.Watch(path, service)
 			if err != nil {
-				return syncer, err
+				syncer.Close()
+				return nil, err
 			}
 
 			log.Println("cyan", "Uploading file changes to", service.Name+", check \"bowery logs\" for details.")
@@ -345,7 +330,7 @@ func initiateSync(state *db.State) (*sync.Syncer, error) {
 	return syncer, nil
 }
 
-func tailLogs(state *db.State, logChan chan redis.Conn) (*os.File, error) {
+func tailLogs(state *db.State, logChan chan redis.Conn) (*syncWriter, error) {
 	log.Debug("Tailing logs.")
 
 	file, err := os.OpenFile(filepath.Join(".bowery", "output.log"),
@@ -364,10 +349,6 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*os.File, error) {
 
 		// Attempt to connect.
 		for i < 1000 {
-			if err != nil {
-				<-time.After(time.Millisecond * 50)
-			}
-
 			conn, err = redis.Dial("tcp", api.RedisPath)
 			if err == nil {
 				logChan <- conn
@@ -375,6 +356,7 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*os.File, error) {
 			}
 
 			i++
+			<-time.After(time.Millisecond * 50)
 		}
 
 		// No successful connection so just forget it.
@@ -419,7 +401,7 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*os.File, error) {
 		}
 	}()
 
-	return file, nil
+	return output, nil
 }
 
 func apiStatus(token string) {
@@ -442,15 +424,27 @@ func apiStatus(token string) {
 
 // syncWriter syncs to the fs after writes.
 type syncWriter struct {
-	File *os.File
+	File  *os.File
+	mutex mutex.Mutex
 }
 
 // Write writes the given buffer and syncs to the fs.
 func (sw *syncWriter) Write(b []byte) (int, error) {
+	sw.mutex.Lock()
+	defer sw.mutex.Unlock()
+
 	n, err := sw.File.Write(b)
 	if err != nil {
 		return n, err
 	}
 
 	return n, sw.File.Sync()
+}
+
+// Close closes the writer after any writes have completed.
+func (sw *syncWriter) Close() error {
+	sw.mutex.Lock()
+	defer sw.mutex.Unlock()
+
+	return sw.File.Close()
 }
