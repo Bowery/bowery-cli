@@ -57,17 +57,11 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		rollbar.Report(err)
 		return 1
 	}
-
 	log.Println("magenta", "Hey there,", strings.Split(dev.Developer.Name, " ")[0]+
 		". Connecting you to Bowery now...")
 
 	state, err := updateOrCreateApp(dev)
 	if err != nil {
-		if err == errors.ErrNoServicePaths {
-			log.Println("yellow", "Your services have been successfully created.")
-			log.Println("yellow", "To initiate file syncing, specify a path.")
-			return 0
-		}
 		rollbar.Report(err)
 		return 1
 	}
@@ -77,7 +71,7 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	if err != nil {
 		if err == errors.ErrNoServicePaths {
 			log.Println("yellow", "Your services have been successfully created.")
-			log.Println("yellow", "To initiate file syncing, specify a path.")
+			log.Println("yellow", "To initiate file syncing, specify a path for at least one service.")
 			return 0
 		}
 
@@ -170,6 +164,16 @@ func updateOrCreateApp(dev *db.Developer) (*db.State, error) {
 		return nil, err
 	}
 
+	// Add a service if none exist.
+	if len(services.Data) <= 0 {
+		log.Println("yellow", "At least one service is required to connect, in the future run `bowery add` to add services.\n")
+
+		err = addServices(services)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// Get the apps current state, and update token/config.
 	state, err := db.GetState()
 	if err != nil && err != errors.ErrNotConnected {
@@ -178,7 +182,7 @@ func updateOrCreateApp(dev *db.Developer) (*db.State, error) {
 	state.Token = dev.Token
 	state.Config = services.Data
 
-	// Connect, and retrieve new state.
+	// Connect and retrieve new state.
 	err = requests.Connect(state)
 	if err != nil {
 		return nil, err
@@ -195,10 +199,6 @@ func updateOrCreateApp(dev *db.Developer) (*db.State, error) {
 	err = state.Save()
 	if err != nil {
 		return nil, err
-	}
-
-	if len(services.Data) <= 0 {
-		return nil, errors.ErrNoServices
 	}
 
 	return state, nil
