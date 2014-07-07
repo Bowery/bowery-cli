@@ -3,7 +3,6 @@ package cmds
 
 import (
 	"github.com/Bowery/bowery/db"
-	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
@@ -15,15 +14,9 @@ func init() {
 }
 
 func appsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	dev, err := db.GetDeveloper()
-	if err != nil && err != errors.ErrNoDeveloper {
+	dev, err := getDeveloper()
+	if err != nil {
 		rollbar.Report(err)
-		return 1
-	}
-
-	// If there's no developer get a token.
-	if dev.Token == "" {
-		log.Println("yellow", "Oops! You must be logged in.")
 		return 1
 	}
 

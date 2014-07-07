@@ -52,24 +52,7 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		return 1
 	}
 
-	dev, err := db.GetDeveloper()
-	if err != nil && err != errors.ErrNoDeveloper {
-		rollbar.Report(err)
-		return 1
-	}
-
-	// If there's no developer get a token.
-	if dev.Token == "" {
-		log.Println("yellow", "Oops! You must be logged in.")
-
-		err = getToken(dev)
-		if err != nil {
-			rollbar.Report(err)
-			return 1
-		}
-	}
-
-	err = getDeveloper(dev)
+	dev, err := getDeveloper()
 	if err != nil {
 		rollbar.Report(err)
 		return 1

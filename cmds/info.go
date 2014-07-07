@@ -18,9 +18,9 @@ func init() {
 }
 
 func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	dev, err := db.GetDeveloper()
-	if err != nil && err != errors.ErrNoDeveloper {
-		rollbar.Report(err)
+	dev, devErr := db.GetDeveloper()
+	if devErr != nil && devErr != errors.ErrNoDeveloper {
+		rollbar.Report(devErr)
 		return 1
 	}
 
@@ -35,7 +35,7 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	} else {
 		log.Println("", "Developer:")
 	}
-	if dev.Token == "" {
+	if devErr != nil {
 		log.Println("yellow", "  Not logged in.")
 	} else {
 		log.Println("", "  Email:", dev.Developer.Email)

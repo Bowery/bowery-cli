@@ -27,8 +27,8 @@ func saveRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 2
 	}
 
-	dev, err := db.GetDeveloper()
-	if err != nil && err != errors.ErrNoDeveloper {
+	dev, err := getDeveloper()
+	if err != nil {
 		rollbar.Report(err)
 		return 1
 	}
