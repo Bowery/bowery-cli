@@ -48,7 +48,7 @@ func configRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 
 	dev, err := db.GetDeveloper()
-	if err != nil {
+	if err != nil && err != errors.ErrNoDeveloper {
 		rollbar.Report(err)
 		return 1
 	}

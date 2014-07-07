@@ -27,15 +27,9 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		return 2 // --help uses 2.
 	}
 
-	// Get developer.
-	dev, err := db.GetDeveloper()
-	if err != nil && err != errors.ErrNoDeveloper {
+	dev, err := getDeveloper()
+	if err != nil {
 		rollbar.Report(err)
-		return 1
-	}
-
-	if dev.Token == "" {
-		log.Println("yellow", "Oops! You must be logged in to perform this action.")
 		return 1
 	}
 

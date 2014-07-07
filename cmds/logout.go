@@ -22,8 +22,7 @@ func logoutRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	// If we have a token, we're logged in.
-	if dev.Token != "" {
+	if err == nil {
 		log.Println("", "Logging you out",
 			strings.Split(dev.Developer.Name, " ")[0]+".")
 	} else {

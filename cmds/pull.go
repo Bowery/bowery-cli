@@ -26,16 +26,9 @@ func init() {
 func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	force := flag.Lookup("force").Value.String()
 
-	// Get developer
-	dev, err := db.GetDeveloper()
-	if err != nil && err != errors.ErrNoDeveloper {
+	dev, err := getDeveloper()
+	if err != nil {
 		rollbar.Report(err)
-		return 1
-	}
-
-	// If there's no developer get a token.
-	if dev.Token == "" {
-		log.Println("yellow", "Oops! You must be logged in to perform this action.")
 		return 1
 	}
 

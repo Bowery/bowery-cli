@@ -33,7 +33,8 @@ func GetDeveloper() (*Developer, error) {
 	dev.path = filepath.Join(os.Getenv(sys.HomeVar), dev.path)
 
 	err := load(dev, dev.path)
-	if err == io.EOF || os.IsNotExist(err) {
+	if err == io.EOF || os.IsNotExist(err) || dev.Token == "" ||
+		dev.Developer == nil {
 		err = errors.ErrNoDeveloper
 	}
 

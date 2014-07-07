@@ -26,11 +26,21 @@ func loginRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	// If we have a token, we're logged in.
-	if dev.Token != "" {
-		log.Println("", "You're logged in as",
-			strings.Split(dev.Developer.Name, " ")[0]+".")
-		return 0
+	// If dev was found then check if token is up to date.
+	if err == nil {
+		ok, err := devUpToDate(dev)
+		if err != nil {
+			rollbar.Report(err)
+			return 1
+		}
+
+		if ok {
+			log.Println("", "You're logged in as",
+				strings.Split(dev.Developer.Name, " ")[0]+".")
+			return 0
+		} else {
+			log.Println("yellow", "Oops! Your login information is out of date.")
+		}
 	}
 
 	err = getToken(dev)
@@ -39,7 +49,7 @@ func loginRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	err = getDeveloper(dev)
+	err = updateDeveloper(dev)
 	if err != nil {
 		rollbar.Report(err)
 		return 1
@@ -52,6 +62,53 @@ func loginRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	return 0
 }
 
+// getDeveloper retrieves the local dev and updates if out of date, or no
+// dev exists.
+func getDeveloper() (*db.Developer, error) {
+	dev, err := db.GetDeveloper()
+	if err != nil && err != errors.ErrNoDeveloper {
+		return dev, err
+	}
+
+	ok := false
+	if err != nil {
+		log.Println("yellow", "Oops! You must be logged in.")
+	} else {
+		ok, err = devUpToDate(dev)
+		if err != nil {
+			return dev, err
+		}
+
+		if !ok {
+			log.Println("yellow", "Oops! Your login information is out of date.")
+		}
+	}
+
+	if err != nil || !ok {
+		err = getToken(dev)
+		if err != nil {
+			return dev, err
+		}
+	}
+
+	return dev, updateDeveloper(dev)
+}
+
+// devUpToDate checks if a developers token is up to date.
+func devUpToDate(dev *db.Developer) (bool, error) {
+	remoteDev, err := requests.GetDeveloper(dev.Token)
+	if err != nil && err != errors.ErrInvalidToken {
+		return false, err
+	}
+
+	if remoteDev != nil && dev.Token == remoteDev.Token {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// getToken gets the login information for a developer and gets a new token.
 func getToken(dev *db.Developer) error {
 	var err error
 	i := 0
@@ -105,7 +162,8 @@ func getToken(dev *db.Developer) error {
 	return dev.Save()
 }
 
-func getDeveloper(dev *db.Developer) error {
+// updateDeveloper gets the most up to date dev data and saves it.
+func updateDeveloper(dev *db.Developer) error {
 	// Get the developer from the devs token.
 	developer, err := requests.GetDeveloper(dev.Token)
 	if err != nil {
