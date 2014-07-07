@@ -49,11 +49,10 @@ const (
 func init() {
 	if env == "development" {
 		if host == "" {
-			host = "localhost"
+			host = "10.0.0.15"
 		}
-
 		BasePath = "http://" + host + ":3000"
-		BroomePath = "http://" + host + ":4000"
+		BroomePath = "http://127.0.0.1:4000"
 		RedisPath = host + ":6379"
 
 		if boweryApi != "" {

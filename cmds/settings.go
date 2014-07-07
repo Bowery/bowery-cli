@@ -4,12 +4,12 @@ package cmds
 import (
 	"strings"
 
-	"github.com/Bowery/bowery/cli/db"
-	"github.com/Bowery/bowery/cli/errors"
-	"github.com/Bowery/bowery/cli/log"
-	"github.com/Bowery/bowery/cli/prompt"
-	"github.com/Bowery/bowery/cli/requests"
-	"github.com/Bowery/bowery/cli/rollbar"
+	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/errors"
+	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/bowery/prompt"
+	"github.com/Bowery/bowery/requests"
+	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
 
