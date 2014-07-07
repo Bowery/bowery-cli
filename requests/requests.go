@@ -804,3 +804,30 @@ func isRefusedConn(err error) bool {
 
 	return false
 }
+
+// ResetPassword sends request to broome to send password reset email
+func ResetPassword(email string) error {
+	res, err := http.Get(api.BroomePath + strings.Replace(api.ResetPasswordPath, "{email}", email, -1))
+
+	if err != nil {
+		return errors.NewStackError(err)
+	}
+	defer res.Body.Close()
+
+	resetRes := new(Res)
+	decoder := json.NewDecoder(res.Body)
+	err = decoder.Decode(resetRes)
+	if err != nil {
+		return errors.NewStackError(err)
+	}
+
+	if resetRes.Status == "success" {
+		return nil
+	}
+
+	if strings.Contains(resetRes.Error(), "not found") {
+		return errors.New("Email does not match existing user.")
+	}
+
+	return errors.NewStackError(errors.ErrResetRequest)
+}
