@@ -32,8 +32,10 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	var app *schemas.Application
-	var state *db.State
+	var (
+		app   *schemas.Application
+		state *db.State
+	)
 	inAppDir := false
 	isAppOwner := false
 

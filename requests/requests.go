@@ -536,20 +536,23 @@ func DevPing(token string) error {
 	return nil
 }
 
-// SatelliteUpload uploads the given tar stream to the satellite endpoint.
-func SatelliteUpload(url, serviceName string, file io.Reader) error {
+// SatelliteUpload sends an upload request to a satellite endpoint, including
+// a tar upload file if given.
+func SatelliteUpload(url, serviceName string, file *os.File) error {
 	var body bytes.Buffer
-
-	// Create the form body, and add the file field.
 	writer := multipart.NewWriter(&body)
-	part, err := writer.CreateFormFile("file", "upload")
-	if err != nil {
-		return errors.NewStackError(err)
-	}
-	// Copy the file to the part.
-	_, err = io.Copy(part, file)
-	if err != nil {
-		return err
+
+	// Write file to multipart body if given.
+	if file != nil {
+		part, err := writer.CreateFormFile("file", "upload")
+		if err != nil {
+			return errors.NewStackError(err)
+		}
+
+		_, err = io.Copy(part, file)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Get current app and add fields for init, build, test, and start.
@@ -558,14 +561,23 @@ func SatelliteUpload(url, serviceName string, file io.Reader) error {
 		return err
 	}
 
-	if service := state.Config[serviceName]; service != nil {
-		writer.WriteField("init", service.Init)
-		writer.WriteField("build", service.Build)
-		writer.WriteField("test", service.Test)
-		writer.WriteField("start", service.Start)
+	service := state.Config[serviceName]
+	if service != nil {
+		err = writer.WriteField("init", service.Init)
+		if err == nil {
+			err = writer.WriteField("build", service.Build)
+		}
+		if err == nil {
+			err = writer.WriteField("test", service.Test)
+		}
+		if err == nil {
+			err = writer.WriteField("start", service.Start)
+		}
 	}
-
-	if err = writer.Close(); err != nil {
+	if err == nil {
+		err = writer.Close()
+	}
+	if err != nil {
 		return err
 	}
 

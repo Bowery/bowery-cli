@@ -46,6 +46,7 @@ var (
 // Error templates to be used with Newf.
 const (
 	ErrPathNotFoundTmpl = "The path for %s(%s) does not exist. Create it to continue. Error Code: 18"
+	ErrPathNotDirTmpl   = "The path for %s(%s) is not a directory. Error Code: 27"
 	ErrSyncTmpl         = "(%s): %s"
 	ErrLoginRetryTmpl   = "%s Try again."
 	ErrInvalidJSONTmpl  = "Invalid JSON in file %s. Error Code: 19"

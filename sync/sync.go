@@ -47,6 +47,9 @@ func NewWatcher(path string, service *schemas.Service) *Watcher {
 
 // Start handles file events and uploads the changes.
 func (watcher *Watcher) Start(evChan chan *Event, errChan chan error) {
+	if watcher.Path == "" {
+		return
+	}
 	stats := make(map[string]os.FileInfo)
 	found := make([]string, 0)
 
@@ -197,27 +200,32 @@ func (watcher *Watcher) Start(evChan chan *Event, errChan chan error) {
 
 // Upload sends the paths contents to the service compressed.
 func (watcher *Watcher) Upload() error {
-	var err error
+	var (
+		err  error
+		file *os.File
+	)
 	path := watcher.uploadPath()
 	i := 0
 
-	upload, err := tar.Tar(watcher.Path)
-	if err != nil {
-		return watcher.wrapErr(err)
-	}
+	if watcher.Path != "" {
+		upload, err := tar.Tar(watcher.Path)
+		if err != nil {
+			return watcher.wrapErr(err)
+		}
 
-	// Write the tgz file to read from.
-	file, err := os.Create(path)
-	if err != nil {
-		return watcher.wrapErr(err)
-	}
-	defer os.RemoveAll(path)
-	defer file.Close()
+		// Write the tgz file to read from.
+		file, err = os.Create(path)
+		if err != nil {
+			return watcher.wrapErr(err)
+		}
+		defer os.RemoveAll(path)
+		defer file.Close()
 
-	// Copy the contents to the file.
-	_, err = io.Copy(file, upload)
-	if err != nil {
-		return watcher.wrapErr(err)
+		// Copy the contents to the file.
+		_, err = io.Copy(file, upload)
+		if err != nil {
+			return watcher.wrapErr(err)
+		}
 	}
 
 	for i < 1000 {
@@ -227,9 +235,11 @@ func (watcher *Watcher) Upload() error {
 		}
 
 		// Make sure we're at the beginning of the file.
-		_, err = file.Seek(0, os.SEEK_SET)
-		if err != nil {
-			return watcher.wrapErr(err)
+		if watcher.Path != "" {
+			_, err = file.Seek(0, os.SEEK_SET)
+			if err != nil {
+				return watcher.wrapErr(err)
+			}
 		}
 
 		// Attempt to upload the file to the services satellite.
@@ -296,7 +306,7 @@ func NewSyncer() *Syncer {
 }
 
 // Watch starts watching the given path and updates changes to the service.
-func (syncer *Syncer) Watch(path string, service *schemas.Service) error {
+func (syncer *Syncer) Watch(path string, service *schemas.Service) {
 	watcher := NewWatcher(path, service)
 	syncer.Watchers = append(syncer.Watchers, watcher)
 
@@ -311,8 +321,6 @@ func (syncer *Syncer) Watch(path string, service *schemas.Service) error {
 
 		watcher.Start(syncer.Event, syncer.Error)
 	}()
-
-	return nil
 }
 
 // Close closes all the watchers.

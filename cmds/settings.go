@@ -33,7 +33,7 @@ func settingsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int
 		var ok bool
 		handler, ok = settingHandlers[args[0]]
 		if !ok {
-			log.Println("red", "Invalid choice.")
+			log.Fprintln(os.Stderr, "red", "Invalid choice.")
 			return 1
 		}
 	} else {
