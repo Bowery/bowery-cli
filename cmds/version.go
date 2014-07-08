@@ -13,7 +13,11 @@ import (
 )
 
 func init() {
-	Cmds["version"] = &Cmd{versionRun, "version", "Display the version of bowery.", ""}
+	Cmds["version"] = &Cmd{
+		Run:   versionRun,
+		Usage: "version",
+		Short: "Display the version of bowery.",
+	}
 }
 
 func versionRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

@@ -16,7 +16,10 @@ import (
 )
 
 func init() {
-	Cmds["logs"] = &Cmd{logsRun, "logs", "Tail your application's logs.", ""}
+	Cmds["logs"] = &Cmd{
+		Run:   logsRun,
+		Usage: "logs",
+		Short: "Tail your application's logs."}
 }
 
 func logsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

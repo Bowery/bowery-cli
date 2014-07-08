@@ -24,7 +24,11 @@ var settingHandlers = map[string]settingHandler{
 }
 
 func init() {
-	Cmds["settings"] = &Cmd{settingsRun, "settings <setting>", "Edit your Bowery account settings.", ""}
+	Cmds["settings"] = &Cmd{
+		Run:   settingsRun,
+		Usage: "settings <setting>",
+		Short: "Edit your Bowery account settings.",
+	}
 }
 
 func settingsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

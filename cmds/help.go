@@ -13,7 +13,11 @@ import (
 )
 
 func init() {
-	Cmds["help"] = &Cmd{helpRun, "help [command]", "Display usage for commands.", ""}
+	Cmds["help"] = &Cmd{
+		Run:   helpRun,
+		Usage: "help [command]",
+		Short: "Display usage for commands.",
+	}
 }
 
 func helpRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

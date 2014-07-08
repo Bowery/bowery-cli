@@ -26,4 +26,7 @@ type Cmd struct {
 
 	// Detailed description. Used in help page.
 	Description string
+
+	// Force command line flag.
+	Force bool
 }

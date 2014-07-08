@@ -15,7 +15,11 @@ import (
 )
 
 func init() {
-	Cmds["signup"] = &Cmd{signupRun, "signup", "Sign up for Bowery.", ""}
+	Cmds["signup"] = &Cmd{
+		Run:   signupRun,
+		Usage: "signup",
+		Short: "Sign up for Bowery.",
+	}
 }
 
 func signupRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

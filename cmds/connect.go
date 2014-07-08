@@ -31,7 +31,11 @@ var (
 )
 
 func init() {
-	Cmds["connect"] = &Cmd{connectRun, "connect", "Bootup the app in the current directory.", ""}
+	Cmds["connect"] = &Cmd{
+		Run:   connectRun,
+		Usage: "connect",
+		Short: "Bootup the app in the current directory.",
+	}
 }
 
 func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

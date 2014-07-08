@@ -17,7 +17,11 @@ import (
 )
 
 func init() {
-	Cmds["save"] = &Cmd{saveRun, "save <name>", "Save a service.", ""}
+	Cmds["save"] = &Cmd{
+		Run:   saveRun,
+		Usage: "save <name>",
+		Short: "Save a service.",
+	}
 }
 
 func saveRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

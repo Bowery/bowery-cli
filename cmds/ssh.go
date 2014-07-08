@@ -16,7 +16,11 @@ import (
 )
 
 func init() {
-	Cmds["ssh"] = &Cmd{sshRun, "ssh <name>", "Connect to a service via ssh.", ""}
+	Cmds["ssh"] = &Cmd{
+		Run:   sshRun,
+		Usage: "ssh <name>",
+		Short: "Connect to a service via ssh.",
+	}
 }
 
 func sshRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

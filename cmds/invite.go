@@ -8,7 +8,11 @@ import (
 )
 
 func init() {
-	Cmds["invite"] = &Cmd{inviteRun, "invite", "Invite a friend to use Bowery.", ""}
+	Cmds["invite"] = &Cmd{
+		Run:   inviteRun,
+		Usage: "invite",
+		Short: "Invite a friend to use Bowery.",
+	}
 }
 
 func inviteRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

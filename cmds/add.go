@@ -15,7 +15,11 @@ import (
 )
 
 func init() {
-	Cmds["add"] = &Cmd{addRun, "add [names]", "Add services to your application.", ""}
+	Cmds["add"] = &Cmd{
+		Run:   addRun,
+		Usage: "add [names]",
+		Short: "Add services to your application.",
+	}
 }
 
 func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

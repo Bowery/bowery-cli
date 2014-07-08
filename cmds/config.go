@@ -13,7 +13,11 @@ import (
 )
 
 func init() {
-	cmd := &Cmd{configRun, "config <key> [value]", "Set custom configuration options.", ""}
+	cmd := &Cmd{
+		Run:   configRun,
+		Usage: "config <key> [value]",
+		Short: "Set custom configuration options.",
+	}
 	cmd.Description = "Sets custom configuration options for connecting to Bowery." +
 		"\n\nCurrent config options are:" +
 		"\n  host  - The host bowery is running on" +

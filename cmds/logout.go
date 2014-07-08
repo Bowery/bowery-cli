@@ -12,7 +12,11 @@ import (
 )
 
 func init() {
-	Cmds["logout"] = &Cmd{logoutRun, "logout", "Log out of your Bowery account.", ""}
+	Cmds["logout"] = &Cmd{
+		Run:   logoutRun,
+		Usage: "logout",
+		Short: "Log out of your Bowery account.",
+	}
 }
 
 func logoutRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
