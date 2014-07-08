@@ -2,27 +2,28 @@ package requests
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/gopackages/schemas"
 )
 
-var TestDeveloper = &schemas.Developer{
-	ID:        "5303a1636462d4d468000001",
-	CreatedAt: 1398102273377,
-	Email:     "steve@bowery.io",
-	IsPaid:    true,
-	License:   "somelicense",
-	Name:      "steve",
-	Token:     "sometoken",
-}
+var (
+	TestDeveloper       *schemas.Developer
+	TestApplications    []*schemas.Application
+	TestState           *db.State
+	TestImage           *schemas.Image
+	globalTestDeveloper *schemas.Developer
+)
 
 var TestService = &schemas.Service{
 	DockerID:      "92e91347f0ce8ab97823a8c6fb0b6d3e0424ef12e7c3ea2c6ebcf9206fd61cb6",
@@ -38,31 +39,6 @@ var TestService = &schemas.Service{
 	Test:          "test cmd",
 }
 
-var TestApplications = []*schemas.Application{
-	&schemas.Application{
-		ID:          "5303a1636462d4d468000002",
-		Name:        "someapp",
-		DeveloperID: TestDeveloper.ID,
-		UpdatedAt:   1398102273378,
-		Services:    []*schemas.Service{},
-	},
-}
-
-var TestState = &db.State{
-	Token:  TestDeveloper.Token,
-	App:    TestApplications[0],
-	Config: map[string]*db.Service{},
-	Path:   filepath.Join(".bowery", "state"),
-}
-
-var TestImage = &schemas.Image{
-	ID:          "5303a1636462d4d468000003",
-	Name:        "testimage",
-	Description: "desc",
-	CreatorID:   TestDeveloper.ID,
-	UpdatedAt:   1398102273378,
-}
-
 var TestVersion = "2.1.2"
 
 func init() {
@@ -71,7 +47,40 @@ func init() {
 		return
 	}
 
+	TestDeveloper, err = CreateDeveloper("steve", "steve"+strconv.Itoa(time.Now().Nanosecond())+"@bowery.io", "somepassword")
+	if err != nil {
+		fmt.Println("Create test developer failed")
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(TestDeveloper)
+
+	TestApplications = []*schemas.Application{
+		&schemas.Application{
+			ID:          "5303a1636462d4d468000002",
+			Name:        "someapp",
+			DeveloperID: TestDeveloper.ID,
+			UpdatedAt:   1398102273378,
+			Services:    []*schemas.Service{},
+		},
+	}
+
+	TestState = &db.State{
+		Token:  TestDeveloper.Token,
+		App:    TestApplications[0],
+		Config: map[string]*db.Service{},
+		Path:   filepath.Join(".bowery", "state"),
+	}
+
 	TestState.Save()
+
+	TestImage = &schemas.Image{
+		ID:          "5303a1636462d4d468000003",
+		Name:        "testimage",
+		Description: "desc",
+		CreatorID:   TestDeveloper.ID,
+		UpdatedAt:   1398102273378,
+	}
 
 	return
 }
@@ -81,13 +90,13 @@ func TestGetTokenByLoginSuccessful(t *testing.T) {
 	defer server.Close()
 	api.BasePath = server.URL
 
-	token, err := GetTokenByLogin("cash@bowery.io", "supersecurepassword")
+	token, err := GetTokenByLogin(TestDeveloper.Email, "somepassword")
+	TestDeveloper.Token = token
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if token != "sometoken" {
-		t.Error("Token isn't the expected value", token)
+	if token == "" {
+		t.Fatal("Did not get token.")
 	}
 }
 
@@ -102,12 +111,13 @@ func TestCreateDeveloperSuccessful(t *testing.T) {
 	defer server.Close()
 	api.BasePath = server.URL
 
-	dev, err := CreateDeveloper("steve", "steve@bowery.io", "supersecurepassword")
+	email := "ricky" + strconv.Itoa(time.Now().Nanosecond()) + "@bowery.io"
+	dev, err := CreateDeveloper("steve", email, "supersecurepassword")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if dev.Name != "steve" || dev.Email != "steve@bowery.io" {
+	if dev.Name != "steve" || dev.Email != email {
 		t.Error("Failed to create new developer")
 	}
 }
@@ -123,12 +133,12 @@ func TestGetDeveloperSuccessful(t *testing.T) {
 	defer server.Close()
 	api.BasePath = server.URL
 
-	dev, err := GetDeveloper("sometoken")
+	dev, err := GetDeveloper(TestDeveloper.Token)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if dev.Token != "sometoken" {
+	if dev.Token != TestDeveloper.Token {
 		t.Error("Failed to get developer")
 	}
 }

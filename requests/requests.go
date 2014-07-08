@@ -36,7 +36,7 @@ func GetTokenByLogin(email, password string) (string, error) {
 		return "", errors.NewStackError(err)
 	}
 
-	res, err := http.Post(api.BasePath+api.CreateTokenPath, "application/json", &body)
+	res, err := http.Post(api.BroomePath+api.CreateTokenPath, "application/json", &body)
 	if err != nil {
 		return "", errors.NewStackError(err)
 	}
@@ -76,7 +76,7 @@ func CreateDeveloper(name, email, password string) (*schemas.Developer, error) {
 		return nil, errors.NewStackError(err)
 	}
 
-	res, err := http.Post(api.BasePath+api.CreateDeveloperPath, "application/json", &body)
+	res, err := http.Post(api.BroomePath+api.CreateDeveloperPath, "application/json", &body)
 	if err != nil {
 		return nil, errors.NewStackError(err)
 	}
@@ -112,7 +112,7 @@ func CreateDeveloper(name, email, password string) (*schemas.Developer, error) {
 
 // GetDeveloper retrieves the developer for the given token.
 func GetDeveloper(token string) (*schemas.Developer, error) {
-	res, err := http.Get(api.BasePath + strings.Replace(api.MePath, "{token}", token, -1))
+	res, err := http.Get(api.BroomePath + strings.Replace(api.MePath, "{token}", token, -1))
 	if err != nil {
 		return nil, errors.NewStackError(err)
 	}
@@ -526,7 +526,7 @@ func SatelliteCheckHealth(url string) error {
 // DevPing checks to see if the api is up and running and updates
 // the developers lastActive field.
 func DevPing(token string) error {
-	endpoint := api.BasePath + strings.Replace(api.CheckPath, "{token}", token, -1)
+	endpoint := api.BroomePath + strings.Replace(api.CheckPath, "{token}", token, -1)
 	res, err := http.Get(endpoint)
 	if err != nil {
 		return errors.NewStackError(err)
@@ -803,4 +803,31 @@ func isRefusedConn(err error) bool {
 	}
 
 	return false
+}
+
+// ResetPassword sends request to broome to send password reset email
+func ResetPassword(email string) error {
+	res, err := http.Get(api.BroomePath + strings.Replace(api.ResetPasswordPath, "{email}", email, -1))
+
+	if err != nil {
+		return errors.NewStackError(err)
+	}
+	defer res.Body.Close()
+
+	resetRes := new(Res)
+	decoder := json.NewDecoder(res.Body)
+	err = decoder.Decode(resetRes)
+	if err != nil {
+		return errors.NewStackError(err)
+	}
+
+	if resetRes.Status == "success" {
+		return nil
+	}
+
+	if strings.Contains(resetRes.Error(), "not found") {
+		return errors.ErrInvalidEmail
+	}
+
+	return errors.NewStackError(errors.ErrResetRequest)
 }

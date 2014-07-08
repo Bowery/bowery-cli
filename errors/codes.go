@@ -170,6 +170,12 @@ var errorCodes = []Error{
 		Description: "The container running the service to which you're trying to connect is down.\n" +
 			"Running `bowery restart` with the name of the service should help.",
 	},
+	Error{
+		Code:  "26",
+		Title: ErrResetRequest.Error(),
+		Description: "Something went wrong while trying to reset your password and send you an email.\n" +
+			"Please try again.",
+	},
 }
 
 func GetAll() []Error {
