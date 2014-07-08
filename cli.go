@@ -20,6 +20,7 @@ var (
 
 func init() {
 	flag.Bool("force", false, "Force pull.")
+	flag.Bool("f", false, "Force pull.")
 }
 
 func main() {

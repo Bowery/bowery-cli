@@ -26,7 +26,8 @@ func configRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	var err error
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
-			"Usage: bowery", Cmds["config"].Usage, "\n\n"+Cmds["config"].Short)
+			"Usage: bowery", Cmds["config"].Usage, "\n\n"+Cmds["config"].Short+"\n")
+		fmt.Fprintln(os.Stderr, "Keys:\n  host\n  redis")
 		return 2
 	}
 

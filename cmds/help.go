@@ -35,9 +35,9 @@ func helpRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 
 	// Ensure output is correctly aligned.
 	tabWriter := tabwriter.NewWriter(os.Stderr, 0, 0, 8, ' ', 0)
-	fmt.Fprintln(os.Stderr, "Usage: bowery [option] <command> [args]\n")
-	fmt.Fprintln(os.Stderr, "Options:\n  --force Force actions instead of asking.\n")
-	fmt.Fprintln(os.Stderr, "Commands:")
+	fmt.Fprintln(tabWriter, "Usage: bowery [option] <command> [args]\n")
+	fmt.Fprintln(tabWriter, "Options:\n  --force, -f\tForce actions instead of asking.\n")
+	fmt.Fprintln(tabWriter, "Commands:")
 
 	for _, cmd := range Cmds {
 		// \t is used to separate columns.

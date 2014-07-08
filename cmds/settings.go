@@ -2,6 +2,9 @@
 package cmds
 
 import (
+	"fmt"
+	"net/mail"
+	"os"
 	"strings"
 
 	"github.com/Bowery/bowery/db"
@@ -21,7 +24,7 @@ var settingHandlers = map[string]settingHandler{
 }
 
 func init() {
-	Cmds["settings"] = &Cmd{settingsRun, "settings", "Edit your Bowery account settings.", ""}
+	Cmds["settings"] = &Cmd{settingsRun, "settings <setting>", "Edit your Bowery account settings.", ""}
 }
 
 func settingsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
@@ -34,11 +37,13 @@ func settingsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int
 			return 1
 		}
 	} else {
-		log.Println("cyan", "Settings:")
+		fmt.Fprintln(os.Stderr,
+			"Usage: bowery", Cmds["settings"].Usage, "\n\n"+Cmds["settings"].Short+"\n")
+		fmt.Fprintln(os.Stderr, "Settings:")
 		for name, _ := range settingHandlers {
-			log.Println("", "\t"+name)
+			fmt.Fprintln(os.Stderr, " ", name)
 		}
-		return 0
+		return 2
 	}
 
 	// if handler returns error, report it
@@ -52,34 +57,44 @@ func settingsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int
 
 func password(keen *keen.Client, args ...string) error {
 	dev, err := db.GetDeveloper()
-	if err == errors.ErrNoDeveloper {
-		ok, err := prompt.Ask("Would you like to request a password reset")
-		if !ok {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-
-		email, err := prompt.Basic("email", true)
-		if err != nil {
-			return err
-		}
-
-		if err = requests.ResetPassword(email); err != nil {
-			return err
-		}
-
-		log.Println("yellow", "Thank you. Check your email for a link to reset your password.")
-
-		keen.AddEvent("broome password reset", map[string]*db.Developer{"user": dev})
-	}
-
-	if err != nil {
+	if err != nil && err != errors.ErrNoDeveloper {
 		return err
 	}
 
-	fancyName := strings.Split(dev.Developer.Name, " ")[0]
-	log.Println("", "You're logged in as", fancyName+". Please do `bowery logout` before trying to reset your password")
+	if err == nil {
+		log.Println("yellow", "You're logged in as", strings.Split(dev.Developer.Name, " ")[0]+
+			". Please do `bowery logout` before trying to reset your password.")
+		return nil
+	}
+
+	ok, err := prompt.Ask("Would you like to request a password reset")
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return nil
+	}
+
+	valid := false
+	email := ""
+	for !valid {
+		email, err = prompt.Basic("Email", true)
+		if err != nil {
+			return err
+		}
+		_, err = mail.ParseAddress(email)
+		if err != nil {
+			log.Println("yellow", "Try again! Valid email address required.")
+		} else {
+			valid = true
+		}
+	}
+
+	if err = requests.ResetPassword(email); err != nil {
+		return err
+	}
+
+	log.Println("", "Thank you. Check your email for a link to reset your password.")
+	keen.AddEvent("broome password reset", map[string]string{"email": email})
 	return nil
 }
