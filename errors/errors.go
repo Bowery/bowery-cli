@@ -40,6 +40,7 @@ var (
 	ErrOverCapacity     = errors.New("Bowery is momentarily over capacity. Please try again. Error Code: 24")
 	ErrContainerConnect = errors.New("Unable to connect to container. Run `bowery restart` if this problem persists. Error Code: 25")
 	ErrResetRequest     = errors.New("Unable to reset your password. Please Try again. Error Code: 26")
+	ErrInvalidEmail = errors.New("Email does not match an existing user.")
 )
 
 // Error templates to be used with Newf.

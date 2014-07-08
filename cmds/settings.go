@@ -52,34 +52,34 @@ func settingsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int
 
 func password(keen *keen.Client, args ...string) error {
 	dev, err := db.GetDeveloper()
-	if err != nil && err != errors.ErrNoDeveloper {
-		return err
+	if err == errors.ErrNoDeveloper {
+		ok, err := prompt.Ask("Would you like to request a password reset")
+		if !ok {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		email, err := prompt.Basic("email", true)
+		if err != nil {
+			return err
+		}
+
+		if err = requests.ResetPassword(email); err != nil {
+			return err
+		}
+
+		log.Println("yellow", "Thank you. Check your email for a link to reset your password.")
+
+		keen.AddEvent("broome password reset", map[string]*db.Developer{"user": dev})
 	}
 
-	// If we have a token, we're logged in.
-	if dev.Token != "" {
-		log.Println("", "You're logged in as",
-			strings.Split(dev.Developer.Name, " ")[0]+". Please do `bowery logout` if you wish to reset your password")
-		return nil
-	}
-
-	ok, err := prompt.Ask("would you like to request a password reset")
-	if !ok {
-		return nil
-	}
-
-	email, err := prompt.Basic("email", true)
 	if err != nil {
 		return err
 	}
 
-	if err = requests.ResetPassword(email); err != nil {
-		return err
-	}
-
-	log.Println("yellow", "Thank you. Check your email for a link to reset your password.")
-
-	keen.AddEvent("broome password reset", map[string]*db.Developer{"user": dev})
-
+	fancyName := strings.Split(dev.Developer.Name, " ")[0]
+	log.Println("", "You're logged in as", fancyName+". Please do `bowery logout` before trying to reset your password")
 	return nil
 }

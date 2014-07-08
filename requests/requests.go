@@ -826,7 +826,7 @@ func ResetPassword(email string) error {
 	}
 
 	if strings.Contains(resetRes.Error(), "not found") {
-		return errors.New("Email does not match existing user.")
+		return errors.ErrInvalidEmail
 	}
 
 	return errors.NewStackError(errors.ErrResetRequest)
