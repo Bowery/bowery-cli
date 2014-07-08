@@ -2,7 +2,7 @@
   "app": {
     "_id": "5303a1636462d4d468000002",
     "name": "someapp",
-    "developerId": "5303a1636462d4d468000001",
+    "developerId": "",
     "updatedAt": 1398102273378,
     "services": [],
     "isActive": false
