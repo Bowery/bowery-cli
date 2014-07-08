@@ -165,7 +165,7 @@ func writeTarHeader(header *tar.Header, reader *tar.Reader, root string) error {
 			return err
 		}
 
-		return dest.Chmod(os.FileMode(header.Mode))
+		return chmod(dest, "", os.FileMode(header.Mode))
 	// Hard link
 	case tar.TypeLink:
 		err = os.MkdirAll(filepath.Dir(path), os.ModePerm|os.ModeDir)
@@ -199,7 +199,7 @@ func writeTarHeader(header *tar.Header, reader *tar.Reader, root string) error {
 			return err
 		}
 
-		return os.Chmod(path, os.FileMode(header.Mode))
+		return chmod(nil, path, os.FileMode(header.Mode))
 	}
 
 	return nil
