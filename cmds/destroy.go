@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/prompt"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
@@ -38,7 +38,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 
 	// Fetch app.
 	log.Debug("Getting app with id:", args[0])
-	app, err := requests.GetAppById(args[0])
+	app, err := api.GetAppById(args[0])
 	if err != nil {
 		rollbar.Report(err)
 		return 1
@@ -69,7 +69,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	// Remove services.
 	for _, service := range app.Services {
 		log.Println("yellow", "Removing service", service.Name)
-		if err := requests.RemoveService(service.DockerID, dev.Token); err != nil {
+		if err := api.RemoveService(service.DockerID, dev.Token); err != nil {
 			rollbar.Report(err)
 			return 1
 		}
@@ -77,7 +77,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 
 	// Send delete requests.
 	log.Println("yellow", "Attempting to remove application...")
-	if err := requests.DestroyAppByID(app.ID, dev.Token); err != nil {
+	if err := api.DestroyAppByID(app.ID, dev.Token); err != nil {
 		rollbar.Report(err)
 		return 1
 	}

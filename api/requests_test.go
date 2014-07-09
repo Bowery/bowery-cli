@@ -1,19 +1,19 @@
-package requests
+package api
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
 
-	"github.com/Bowery/bowery/api"
+	"github.com/Bowery/bowery/broome"
 	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/responses"
 	"github.com/Bowery/gopackages/schemas"
 )
 
@@ -47,7 +47,7 @@ func init() {
 		return
 	}
 
-	TestDeveloper, err = CreateDeveloper("steve", "steve"+strconv.Itoa(time.Now().Nanosecond())+"@bowery.io", "somepassword")
+	TestDeveloper, err = broome.CreateDeveloper("steve", "steve"+strconv.Itoa(time.Now().Nanosecond())+"@bowery.io", "somepassword")
 	if err != nil {
 		fmt.Println("Create test developer failed")
 		fmt.Println(err)
@@ -84,74 +84,10 @@ func init() {
 	return
 }
 
-func TestGetTokenByLoginSuccessful(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(getTokenByLoginHandler))
-	defer server.Close()
-	api.BasePath = server.URL
-
-	token, err := GetTokenByLogin(TestDeveloper.Email, "somepassword")
-	TestDeveloper.Token = token
-	if err != nil {
-		t.Fatal(err)
-	}
-	if token == "" {
-		t.Fatal("Did not get token.")
-	}
-}
-
-func getTokenByLoginHandler(rw http.ResponseWriter, req *http.Request) {
-	res := &CreateTokenRes{Res: &Res{Status: "created"}, Token: "sometoken"}
-	body, _ := json.Marshal(res)
-	rw.Write(body)
-}
-
-func TestCreateDeveloperSuccessful(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(createDeveloperHandler))
-	defer server.Close()
-	api.BasePath = server.URL
-
-	email := "ricky" + strconv.Itoa(time.Now().Nanosecond()) + "@bowery.io"
-	dev, err := CreateDeveloper("steve", email, "supersecurepassword")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if dev.Name != "steve" || dev.Email != email {
-		t.Error("Failed to create new developer")
-	}
-}
-
-func createDeveloperHandler(rw http.ResponseWriter, req *http.Request) {
-	res := &DeveloperRes{Res: &Res{Status: "created"}, Developer: TestDeveloper}
-	body, _ := json.Marshal(res)
-	rw.Write(body)
-}
-
-func TestGetDeveloperSuccessful(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(getDeveloperByTokenHandler))
-	defer server.Close()
-	api.BasePath = server.URL
-
-	dev, err := GetDeveloper(TestDeveloper.Token)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if dev.Token != TestDeveloper.Token {
-		t.Error("Failed to get developer")
-	}
-}
-
-func getDeveloperByTokenHandler(rw http.ResponseWriter, req *http.Request) {
-	res := &DeveloperRes{Res: &Res{Status: "found"}, Developer: TestDeveloper}
-	body, _ := json.Marshal(res)
-	rw.Write(body)
-}
-
 func GetAppByIdSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(getAppByIdHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	app, err := GetAppById("5303a1636462d4d468000002")
 	if err != nil {
@@ -164,7 +100,7 @@ func GetAppByIdSuccessful(t *testing.T) {
 }
 
 func getAppByIdHandler(rw http.ResponseWriter, req *http.Request) {
-	res := &AppRes{Res: &Res{Status: "found"}, Application: TestApplications[0]}
+	res := &responses.AppRes{Res: &responses.Res{Status: "found"}, Application: TestApplications[0]}
 	body, _ := json.Marshal(res)
 	rw.Write(body)
 }
@@ -172,7 +108,7 @@ func getAppByIdHandler(rw http.ResponseWriter, req *http.Request) {
 func GetAppsSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(getAppsHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	dev := TestDeveloper
 
@@ -189,7 +125,7 @@ func GetAppsSuccessful(t *testing.T) {
 }
 
 func getAppsHandler(rw http.ResponseWriter, req *http.Request) {
-	res := &AppsRes{Res: &Res{Status: "found"}, Applications: TestApplications}
+	res := &responses.AppsRes{Res: &responses.Res{Status: "found"}, Applications: TestApplications}
 	body, _ := json.Marshal(res)
 	rw.Write(body)
 }
@@ -197,7 +133,7 @@ func getAppsHandler(rw http.ResponseWriter, req *http.Request) {
 func TestGetVersion(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(getVersionHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	version, err := GetVersion()
 	if err != nil {
@@ -216,7 +152,7 @@ func getVersionHandler(rw http.ResponseWriter, req *http.Request) {
 func TestDisconnectSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(disconnectHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	dev := TestDeveloper
 
@@ -226,7 +162,7 @@ func TestDisconnectSuccessful(t *testing.T) {
 }
 
 func disconnectHandler(rw http.ResponseWriter, req *http.Request) {
-	res := Res{Status: "success"}
+	res := responses.Res{Status: "success"}
 	body, _ := json.Marshal(res)
 	rw.Write(body)
 }
@@ -234,7 +170,7 @@ func disconnectHandler(rw http.ResponseWriter, req *http.Request) {
 func TestRestartServiceSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(restartServiceHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	dev := TestDeveloper
 	service := TestService
@@ -245,7 +181,7 @@ func TestRestartServiceSuccessful(t *testing.T) {
 }
 
 func restartServiceHandler(rw http.ResponseWriter, req *http.Request) {
-	res := Res{Status: "success"}
+	res := responses.Res{Status: "success"}
 	body, _ := json.Marshal(res)
 	rw.Write(body)
 }
@@ -253,7 +189,7 @@ func restartServiceHandler(rw http.ResponseWriter, req *http.Request) {
 func TestRemoveServiceSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(removeServiceHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	dev := TestDeveloper
 	service := TestService
@@ -264,7 +200,7 @@ func TestRemoveServiceSuccessful(t *testing.T) {
 }
 
 func removeServiceHandler(rw http.ResponseWriter, req *http.Request) {
-	res := Res{Status: "success"}
+	res := responses.Res{Status: "success"}
 	body, _ := json.Marshal(res)
 	rw.Write(body)
 }
@@ -274,7 +210,7 @@ func removeServiceHandler(rw http.ResponseWriter, req *http.Request) {
 func TestSearchImagesSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(searchImagesHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	images, err := SearchImages("testimage")
 	if err != nil {
@@ -287,7 +223,7 @@ func TestSearchImagesSuccessful(t *testing.T) {
 }
 
 func searchImagesHandler(rw http.ResponseWriter, req *http.Request) {
-	res := ImageTypeRes{Res: &Res{Status: "found"}, Images: []*schemas.Image{TestImage}}
+	res := responses.ImageTypeRes{Res: &responses.Res{Status: "found"}, Images: []*schemas.Image{TestImage}}
 	body, _ := json.Marshal(res)
 	rw.Write(body)
 }
@@ -295,7 +231,7 @@ func searchImagesHandler(rw http.ResponseWriter, req *http.Request) {
 func TestFindImageSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(findImageHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	err := FindImage("testimage")
 	if err != nil {
@@ -304,7 +240,7 @@ func TestFindImageSuccessful(t *testing.T) {
 }
 
 func findImageHandler(rw http.ResponseWriter, req *http.Request) {
-	res := Res{Status: "found"}
+	res := responses.Res{Status: "found"}
 	body, _ := json.Marshal(res)
 	rw.Write(body)
 }
@@ -312,7 +248,7 @@ func findImageHandler(rw http.ResponseWriter, req *http.Request) {
 func TestHealthzSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(healthzHandler))
 	defer server.Close()
-	api.BasePath = server.URL
+	BasePath = server.URL
 
 	err := Healthz()
 	if err != nil {
@@ -322,75 +258,4 @@ func TestHealthzSuccessful(t *testing.T) {
 
 func healthzHandler(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte("ok"))
-}
-
-func TestDevPingSuccessful(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(devPingHandler))
-	defer server.Close()
-	api.BasePath = server.URL
-
-	dev := TestDeveloper
-
-	err := DevPing(dev.Token)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func devPingHandler(rw http.ResponseWriter, req *http.Request) {
-	res := Res{Status: "updated"}
-	body, _ := json.Marshal(res)
-	rw.Write(body)
-}
-
-func TestSatelliteUploadSuccessful(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(satelliteUploadHandler))
-	defer server.Close()
-
-	addr, _ := url.Parse(server.URL)
-
-	file, err := os.Create("test.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer file.Close()
-
-	err = SatelliteUpload(addr.Host, TestService.Name, file)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	os.Remove("test.txt")
-}
-
-func satelliteUploadHandler(rw http.ResponseWriter, req *http.Request) {
-	res := Res{Status: "created"}
-	body, _ := json.Marshal(res)
-	rw.Write(body)
-}
-
-func TestSatelliteUpdateSuccessful(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(satelliteUpdateHandler))
-	defer server.Close()
-
-	addr, _ := url.Parse(server.URL)
-
-	file, err := os.Create("test.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer file.Close()
-
-	err = SatelliteUpdate(addr.Host, TestService.Name, "test.txt", "test.txt", "update")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	os.Remove("test.txt")
-}
-
-func satelliteUpdateHandler(rw http.ResponseWriter, req *http.Request) {
-	res := Res{Status: "updated"}
-	body, _ := json.Marshal(res)
-	rw.Write(body)
 }

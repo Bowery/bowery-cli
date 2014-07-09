@@ -7,11 +7,12 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/delancey"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/prompt"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/bowery/tar"
 	"github.com/Bowery/gopackages/keen"
@@ -65,7 +66,7 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	// Get app
 	if !inAppDir {
 		log.Debug("Getting app with id:", args[0])
-		app, err = requests.GetAppById(args[0])
+		app, err = api.GetAppById(args[0])
 		if err != nil {
 			rollbar.Report(err)
 			return 1
@@ -142,7 +143,7 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 			}
 
 			log.Debug("Fetching", service.Name, "files")
-			contents, err := requests.SatelliteDownload(service.SatelliteAddr)
+			contents, err := delancey.Download(service.SatelliteAddr)
 			if err != nil {
 				rollbar.Report(err)
 				return 1

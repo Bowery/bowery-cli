@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Bowery/bowery/broome"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/prompt"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
@@ -100,7 +100,7 @@ func getDeveloper() (*db.Developer, error) {
 
 // devUpToDate checks if a developers token is up to date.
 func devUpToDate(dev *db.Developer) (bool, error) {
-	remoteDev, err := requests.GetDeveloper(dev.Token)
+	remoteDev, err := broome.GetDeveloper(dev.Token)
 	if err != nil && err != errors.ErrInvalidToken {
 		return false, err
 	}
@@ -144,7 +144,7 @@ func getToken(dev *db.Developer) error {
 		}
 		log.Debug("Collected email", email, "pass", pass)
 
-		token, err = requests.GetTokenByLogin(email, pass)
+		token, err = broome.GetTokenByLogin(email, pass)
 		if err != nil {
 			if i < 4 {
 				log.Fprintln(os.Stderr, "red", errors.Newf(errors.ErrLoginRetryTmpl, err))
@@ -169,7 +169,7 @@ func getToken(dev *db.Developer) error {
 // updateDeveloper gets the most up to date dev data and saves it.
 func updateDeveloper(dev *db.Developer) error {
 	// Get the developer from the devs token.
-	developer, err := requests.GetDeveloper(dev.Token)
+	developer, err := broome.GetDeveloper(dev.Token)
 	if err != nil {
 		return err
 	}

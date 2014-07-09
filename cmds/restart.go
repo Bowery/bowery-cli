@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 	"github.com/Bowery/gopackages/schemas"
@@ -63,7 +63,7 @@ func restartRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	}
 	log.Debug("Found service", service.Name)
 
-	newService, err := requests.RestartService(service.DockerID, dev.Token)
+	newService, err := api.RestartService(service.DockerID, dev.Token)
 	if err != nil {
 		rollbar.Report(err)
 		return 1

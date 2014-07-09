@@ -11,17 +11,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 
 	redigo "github.com/garyburd/redigo/redis"
 )
 
 var (
-	debug     = os.Getenv("DEBUG")
-	env       = os.Getenv("ENV")
-	host      = os.Getenv("HOST")
-	logWriter *LogWriter
+	debug        = os.Getenv("DEBUG")
+	env          = os.Getenv("ENV")
+	host         = os.Getenv("HOST")
+	redisPathEnv = os.Getenv("REDIS_ADDR")
+	RedisPath    = "ec2-23-22-237-84.compute-1.amazonaws.com:6379"
+	logWriter    *LogWriter
 )
 
 func init() {
@@ -32,7 +33,16 @@ func init() {
 		devId = dev.Developer.ID
 	}
 
-	logWriter = NewLogWriter(devId, api.RedisPath)
+	if redisPathEnv != "" {
+		RedisPath = redisPathEnv
+	}
+	if dev != nil && dev.Config != nil {
+		r, ok := dev.Config["redis"]
+		if ok && r != "" {
+			RedisPath = r
+		}
+	}
+	logWriter = NewLogWriter(devId, RedisPath)
 }
 
 // Debug prints the given arguments if the ENV var is set to development.
