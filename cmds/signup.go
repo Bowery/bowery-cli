@@ -4,6 +4,7 @@ package cmds
 import (
 	"net/mail"
 	"os"
+	"strings"
 
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
@@ -94,7 +95,9 @@ func signupRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	keen.AddEvent("bowery signup", map[string]*db.Developer{"user": dev})
+	if os.Getenv("ENV") == "production" && !strings.Contains(email, "@bowery.io") {
+		keen.AddEvent("bowery signup", map[string]*db.Developer{"user": dev})
+	}
 
 	log.Println("magenta", "Welcome", developer.Name+"!", "To get started run",
 		"`bowery connect`\nwithin your applications directory.")

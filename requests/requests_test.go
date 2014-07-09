@@ -53,7 +53,6 @@ func init() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println(TestDeveloper)
 
 	TestApplications = []*schemas.Application{
 		&schemas.Application{
