@@ -2,7 +2,6 @@
 package cmds
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -14,11 +13,15 @@ import (
 )
 
 func init() {
-	Cmds["remove"] = &Cmd{removeRun, "remove <names>", "Remove services from your application.", ""}
+	Cmds["remove"] = &Cmd{
+		Run:   removeRun,
+		Usage: "remove <names>",
+		Short: "Remove services from your application.",
+	}
 }
 
 func removeRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	force := flag.Lookup("force").Value.String()
+	force := Cmds["remove"].Force
 
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
@@ -39,7 +42,7 @@ func removeRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 			continue
 		}
 
-		if force != "true" {
+		if !force {
 			ok, err = prompt.Ask("Are you sure you want to remove " + name)
 			if err != nil {
 				rollbar.Report(err)

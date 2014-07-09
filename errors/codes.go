@@ -176,6 +176,11 @@ var errorCodes = []Error{
 		Description: "Something went wrong while trying to reset your password and send you an email.\n" +
 			"Please try again.",
 	},
+	Error{
+		Code:        "27",
+		Title:       ErrPathNotDirTmpl,
+		Description: "The path for a service must be a directory to sync changes.",
+	},
 }
 
 func GetAll() []Error {

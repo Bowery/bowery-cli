@@ -15,21 +15,39 @@ import (
 )
 
 func init() {
-	Cmds["add"] = &Cmd{addRun, "add [names]", "Add services to your application.", ""}
+	Cmds["add"] = &Cmd{
+		Run:   addRun,
+		Usage: "add [names]",
+		Short: "Add services to your application.",
+	}
 }
 
 func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	includedName := true
 	services, err := db.GetServices()
 	if err != nil {
 		rollbar.Report(err)
 		return 1
 	}
 
+	err = addServices(services, args...)
+	if err != nil {
+		rollbar.Report(err)
+		return 1
+	}
+
+	keen.AddEvent("bowery add", services.Data)
+	return 0
+}
+
+// addServices add a number of services and saves them.
+func addServices(services *db.Services, names ...string) error {
+	var err error
+	includedName := true
+
 	// If no given arguments we want to add a single item.
-	if len(args) <= 0 {
+	if len(names) <= 0 {
 		includedName = false
-		args = append(args, "")
+		names = append(names, "")
 
 		log.Println("cyan bold", "New Service Wizard\n")
 		log.Println("magenta", "The basis for a service is it's image. Bowery provides a number of")
@@ -37,14 +55,13 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		log.Println("magenta", "can also run `bowery search` to look them up from the command line.\n")
 	}
 
-	for _, name := range args {
+	for _, name := range names {
 		// Get name if none were given.
 		if name == "" {
 			log.Println("magenta", "What would you like to call this service? (e.g. api, db, cache, imageprocessor, etc)")
 			name, err = prompt.Basic("Name", true)
 			if err != nil {
-				rollbar.Report(err)
-				return 1
+				return err
 			}
 		}
 
@@ -59,8 +76,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		if ok {
 			ok, err = prompt.Ask("Do you want to overwrite " + name)
 			if err != nil {
-				rollbar.Report(err)
-				return 1
+				return err
 			}
 			if !ok {
 				log.Println("yellow", "Skipping", name)
@@ -68,7 +84,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 			}
 		}
 
-		if includedName && len(args) > 1 {
+		if includedName && len(names) > 1 {
 			log.Println("magenta", "Creating", name)
 		}
 
@@ -81,23 +97,20 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		for validImage == false {
 			image, err = prompt.Basic("Image", false)
 			if err != nil {
-				rollbar.Report(err)
-				return 1
+				return err
 			}
 
 			if image != "base" {
 				err := requests.FindImage(image)
 				if err != nil && err != errors.ErrNoImageFound {
-					rollbar.Report(err)
-					return 1
+					return err
 				}
 			}
 
 			if err == errors.ErrNoImageFound {
 				ok, err = prompt.Ask("Invalid image type. Would you like to use the base image")
 				if err != nil {
-					rollbar.Report(err)
-					return 1
+					return err
 				}
 
 				if !ok {
@@ -117,8 +130,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 		path, err := prompt.Basic("Path", false)
 		if err != nil {
-			rollbar.Report(err)
-			return 1
+			return err
 		}
 
 		// Ask for ports
@@ -127,8 +139,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 		ports, err := prompt.Basic("Ports", false)
 		if err != nil {
-			rollbar.Report(err)
-			return 1
+			return err
 		}
 		var portsList []interface{}
 
@@ -140,8 +151,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 				port = strings.Trim(port, " ")
 				num, err := strconv.Atoi(port)
 				if err != nil {
-					rollbar.Report(errors.Newf(errors.ErrInvalidPortTmpl, port))
-					return 1
+					return errors.Newf(errors.ErrInvalidPortTmpl, port)
 				}
 
 				portsList[i] = num
@@ -154,8 +164,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 		start, err := prompt.Basic("Start Command", false)
 		if err != nil {
-			rollbar.Report(err)
-			return 1
+			return err
 		}
 
 		// Ask for build
@@ -164,8 +173,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 		build, err := prompt.Basic("Build Command", false)
 		if err != nil {
-			rollbar.Report(err)
-			return 1
+			return err
 		}
 
 		// Ask for test
@@ -174,8 +182,7 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 		test, err := prompt.Basic("Test Command", false)
 		if err != nil {
-			rollbar.Report(err)
-			return 1
+			return err
 		}
 
 		log.Debug("Adding service", "name", name, "image", image, "path", path, "ports", portsList, "start", start, "build", build, "test", test)
@@ -190,12 +197,5 @@ func addRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 
 	log.Debug("Saving services", services.Data)
-	err = services.Save()
-	if err != nil {
-		rollbar.Report(err)
-		return 1
-	}
-
-	keen.AddEvent("bowery add", services.Data)
-	return 0
+	return services.Save()
 }

@@ -9,7 +9,11 @@ import (
 )
 
 func init() {
-	Cmds["search"] = &Cmd{searchRun, "search [image]", "Search by name for available images.", ""}
+	Cmds["search"] = &Cmd{
+		Run:   searchRun,
+		Usage: "search [image]",
+		Short: "Search by name for available images.",
+	}
 }
 
 func searchRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

@@ -2,7 +2,6 @@
 package cmds
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,11 +19,15 @@ import (
 )
 
 func init() {
-	Cmds["pull"] = &Cmd{pullRun, "pull [id or name]", "Pull down an application and its code.", ""}
+	Cmds["pull"] = &Cmd{
+		Run:   pullRun,
+		Usage: "pull [id or name]",
+		Short: "Pull down an application and its code.",
+	}
 }
 
 func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	force := flag.Lookup("force").Value.String()
+	force := Cmds["pull"].Force
 
 	dev, err := getDeveloper()
 	if err != nil {
@@ -32,8 +35,10 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	var app *schemas.Application
-	var state *db.State
+	var (
+		app   *schemas.Application
+		state *db.State
+	)
 	inAppDir := false
 	isAppOwner := false
 
@@ -87,7 +92,7 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 
 	// If the destination is not-empty confirm with the user that the
 	// action will overwrite the contents of the current directory.
-	if len(files) > 0 && force != "true" {
+	if len(files) > 0 && !force {
 		log.Println("magenta", "Looks like you're trying to pull down an app into a non-empty directory")
 		log.Println("magenta", "Proceeding will overwrite the contents of this directory.")
 		ok, err := prompt.Ask("Are you sure you want to proceed")

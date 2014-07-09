@@ -14,7 +14,11 @@ import (
 )
 
 func init() {
-	Cmds["info"] = &Cmd{infoRun, "info", "Display developer info and application info.", ""}
+	Cmds["info"] = &Cmd{
+		Run:   infoRun,
+		Usage: "info",
+		Short: "Display developer info and application info.",
+	}
 }
 
 func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

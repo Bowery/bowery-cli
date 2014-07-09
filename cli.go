@@ -15,11 +15,13 @@ import (
 )
 
 var (
-	env = os.Getenv("ENV")
+	env   = os.Getenv("ENV")
+	force bool
 )
 
 func init() {
-	flag.Bool("force", false, "Force pull.")
+	flag.BoolVar(&force, "force", false, "Force pull.")
+	flag.BoolVar(&force, "f", false, "Force pull.")
 }
 
 func main() {
@@ -66,5 +68,6 @@ func main() {
 		os.Exit(Cmds["help"].Run(keen, rollbar))
 	}
 
+	cmd.Force = force
 	os.Exit(cmd.Run(keen, rollbar, args...))
 }

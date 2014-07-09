@@ -8,7 +8,11 @@ import (
 )
 
 func init() {
-	Cmds["support"] = &Cmd{supportRun, "support", "Create a support email.", ""}
+	Cmds["support"] = &Cmd{
+		Run:   supportRun,
+		Usage: "support",
+		Short: "Create a support email.",
+	}
 }
 
 func supportRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

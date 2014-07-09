@@ -31,11 +31,15 @@ var (
 )
 
 func init() {
-	Cmds["connect"] = &Cmd{connectRun, "connect", "Bootup the app in the current directory.", ""}
+	Cmds["connect"] = &Cmd{
+		Run:   connectRun,
+		Usage: "connect",
+		Short: "Bootup the app in the current directory.",
+	}
 }
 
 func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	// Create and register signals.
+	hasUploaded := make([]string, 0)
 	signals := make(chan os.Signal, 1)
 	done := make(chan int, 1)
 	signal.Notify(signals, os.Interrupt, os.Kill)
@@ -57,34 +61,48 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		rollbar.Report(err)
 		return 1
 	}
-
 	log.Println("magenta", "Hey there,", strings.Split(dev.Developer.Name, " ")[0]+
 		". Connecting you to Bowery now...")
 
 	state, err := updateOrCreateApp(dev)
 	if err != nil {
-		if err == errors.ErrNoServicePaths {
-			log.Println("yellow", "Your services have been successfully created.")
-			log.Println("yellow", "To initiate file syncing, specify a path.")
-			return 0
-		}
 		rollbar.Report(err)
 		return 1
 	}
 	defer requests.Disconnect(dev.Token)
 
-	syncer, err := initiateSync(state)
+	syncer, servicesUploading, err := initiateSync(state)
 	if err != nil {
-		if err == errors.ErrNoServicePaths {
-			log.Println("yellow", "Your services have been successfully created.")
-			log.Println("yellow", "To initiate file syncing, specify a path.")
-			return 0
-		}
-
 		rollbar.Report(err)
 		return 1
 	}
 	defer syncer.Close()
+
+	// Check if any services are still uploading after a while.
+	go func() {
+		<-time.After(20 * time.Second)
+		hasNotUploaded := make([]string, 0)
+		for _, service := range servicesUploading {
+			found := false
+			for _, s := range hasUploaded {
+				if service.Name == s {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				hasNotUploaded = append(hasNotUploaded, service.Name)
+			}
+		}
+		services := strings.Join(hasNotUploaded, ", ")
+
+		if len(hasNotUploaded) > 0 {
+			log.Println("yellow", "Service(s)", services, "still uploading...")
+			log.Println("yellow", "Large applications and inital uploads can take some time to complete.")
+			log.Println("yellow", "Check `bowery logs` to see the current status of the build.")
+		}
+	}()
 
 	logChan := make(chan redis.Conn, 1)
 	logFile, err := tailLogs(state, logChan)
@@ -99,37 +117,6 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		done <- 0
 	}()
 
-	// If a service takes more than 10 seconds to upload, alert the developer
-	// that some services take a while to upload.
-	hasUploaded := make(map[string]bool)
-	for _, s := range state.App.Services {
-		if state.Config[s.Name].Path != "" {
-			hasUploaded[s.Name] = false
-		}
-	}
-
-	go func() {
-		<-time.After(20 * time.Second)
-		hasNotUploaded := []string{}
-		for service, isUploaded := range hasUploaded {
-			if !isUploaded {
-				hasNotUploaded = append(hasNotUploaded, service)
-			}
-		}
-
-		services := strings.Join(hasNotUploaded, ", ")
-
-		if len(hasNotUploaded) > 0 {
-			if len(hasNotUploaded) == 1 {
-				log.Println("yellow", "Service", services, "is still uploading...")
-			} else {
-				log.Println("yellow", "Services", services, "are still uploading...")
-			}
-			log.Println("yellow", "Large applications and inital uploads can take some time to complete.")
-			log.Println("yellow", "Check `bowery logs` to see the current status of the build.")
-		}
-	}()
-
 	go apiStatus(dev.Token)
 
 	keen.AddEvent("bowery connect", map[string]interface{}{
@@ -142,18 +129,44 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		for {
 			select {
 			case service := <-syncer.Upload:
-				hasUploaded[service.Name] = true
-				log.Println("cyan", "Service", service.Name, "upload complete. Syncing file changes.")
+				config := state.Config[service.Name]
+				hasUploaded = append(hasUploaded, service.Name)
+
+				if config.Path != "" {
+					log.Println("cyan", "Service", service.Name, "upload complete. Syncing file changes.")
+				} else {
+					log.Println("cyan", "Service", service.Name, "commands started. To sync file changes add a path.")
+				}
+
+				// If all the services has uploaded and none have paths exit.
+				if len(hasUploaded) == len(servicesUploading) {
+					hasPaths := false
+
+					for _, service := range servicesUploading {
+						config := state.Config[service.Name]
+
+						if config.Path != "" {
+							hasPaths = true
+							break
+						}
+					}
+
+					if !hasPaths {
+						log.Println("yellow", "Your services have been successfully created.")
+						log.Println("yellow", "To initiate file syncing, specify a path for at least one service.")
+						done <- 0
+					}
+				}
 			case conn := <-logChan:
 				defer conn.Close()
 			case ev := <-syncer.Event:
 				if connected {
-					keen.AddEvent("file synced", map[string]interface{}{"user": dev, "event": ev.String()})
 					log.Println("", ev)
+					keen.AddEvent("file synced", map[string]interface{}{"user": dev, "event": ev.String()})
 				}
 			case err = <-syncer.Error:
 				rollbar.Report(err)
-				done <- 0
+				done <- 1
 			}
 		}
 	}()
@@ -170,6 +183,16 @@ func updateOrCreateApp(dev *db.Developer) (*db.State, error) {
 		return nil, err
 	}
 
+	// Add a service if none exist.
+	if len(services.Data) <= 0 {
+		log.Println("yellow", "At least one service is required to connect, in the future run `bowery add` to add services.\n")
+
+		err = addServices(services)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// Get the apps current state, and update token/config.
 	state, err := db.GetState()
 	if err != nil && err != errors.ErrNotConnected {
@@ -178,7 +201,7 @@ func updateOrCreateApp(dev *db.Developer) (*db.State, error) {
 	state.Token = dev.Token
 	state.Config = services.Data
 
-	// Connect, and retrieve new state.
+	// Connect and retrieve new state.
 	err = requests.Connect(state)
 	if err != nil {
 		return nil, err
@@ -197,30 +220,27 @@ func updateOrCreateApp(dev *db.Developer) (*db.State, error) {
 		return nil, err
 	}
 
-	if len(services.Data) <= 0 {
-		return nil, errors.ErrNoServices
-	}
-
 	return state, nil
 }
 
-func initiateSync(state *db.State) (*sync.Syncer, error) {
-	log.Debug("Intiating file sync.")
-	syncs := make(map[string][]*schemas.Service)
-	hasPaths := false
+func initiateSync(state *db.State) (*sync.Syncer, []*schemas.Service, error) {
+	syncer := sync.NewSyncer()
+	services := make([]*schemas.Service, 0)
 
+	log.Debug("Intiating file sync.")
 	log.Println("", "Services are availble in the forms:")
 	log.Println("", "  <name>.<id>.boweryapps.com")
 	log.Println("", "  <port>.<name>.<id>.boweryapps.com")
+	log.Println("magenta", "Check \"bowery logs\" for service details.")
 
 	printService := func(service *schemas.Service) {
 		log.Println("magenta", "Service", service.Name, "is available at:")
-
-		url := "80: " + service.PublicAddr
 		appIdentifier := state.App.ID
 		if state.App.Name != "" {
 			appIdentifier = state.App.Name
 		}
+
+		url := "80: " + service.PublicAddr
 		if ENV != "development" {
 			url = service.Name + "." + appIdentifier + ".boweryapps.com"
 		}
@@ -236,11 +256,35 @@ func initiateSync(state *db.State) (*sync.Syncer, error) {
 		}
 	}
 
-	// Get the service addrs that need syncing.
+	// Get the list of services that need to upload and/or sync.
 	for _, service := range state.App.Services {
 		config := state.Config[service.Name]
 
-		// Ensure the container is running.
+		// Ensure the path exists and is a directory.
+		if config.Path != "" {
+			info, err := os.Lstat(config.Path)
+			if err != nil {
+				if os.IsNotExist(err) {
+					return nil, nil, errors.Newf(errors.ErrPathNotFoundTmpl, service.Name, config.Path)
+				}
+
+				return nil, nil, err
+			}
+
+			if !info.IsDir() {
+				return nil, nil, errors.Newf(errors.ErrPathNotDirTmpl, service.Name, config.Path)
+			}
+		}
+
+		services = append(services, service)
+	}
+
+	// Check if the services are running and upload/sync them.
+	for _, service := range services {
+		config := state.Config[service.Name]
+		log.Debug("Starting upload for", service.Name, "possibly syncing to", service.SatelliteAddr)
+
+		// Ensure satellite is running for the service.
 		var err error
 		i := 0
 		for i < 1000 {
@@ -253,64 +297,20 @@ func initiateSync(state *db.State) (*sync.Syncer, error) {
 			<-time.After(8 * time.Millisecond)
 		}
 		if err != nil {
-			return nil, errors.NewStackError(errors.ErrContainerConnect)
+			syncer.Close()
+			return nil, nil, errors.NewStackError(errors.ErrContainerConnect)
 		}
 
-		// No reason to sync if no path is given.
-		if config.Path == "" {
-			log.Println("yellow", "Skipping file changes for", service.Name+", no path given.")
-			printService(service)
-			continue
+		syncer.Watch(config.Path, service)
+		if config.Path != "" {
+			log.Println("cyan", "Uploading file changes and running commands for", service.Name+".")
+		} else {
+			log.Println("cyan", "No path, only running commands for", service.Name+".")
 		}
-
-		// Ensure the path is a directory.
-		info, err := os.Lstat(config.Path)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return nil, errors.Newf(errors.ErrPathNotFoundTmpl, service.Name, config.Path)
-			}
-
-			return nil, err
-		}
-		if !info.IsDir() {
-			log.Println("yellow", "Skipping file changes for", service.Name+", path is not a directory.")
-			printService(service)
-			continue
-		}
-
-		// Add the current service to it's sync path.
-		serv, ok := syncs[config.Path]
-		if !ok || serv == nil {
-			syncs[config.Path] = make([]*schemas.Service, 0)
-			serv = syncs[config.Path]
-		}
-		syncs[config.Path] = append(serv, service)
-		hasPaths = true
+		printService(service)
 	}
 
-	if !hasPaths {
-		return nil, errors.ErrNoServicePaths
-	}
-	syncer := sync.NewSyncer()
-
-	// Start syncing all directories, if an error occurs return error with
-	// syncer so it can close the existing watchers.
-	for path, services := range syncs {
-		for _, service := range services {
-			log.Debug("Watching", path, "and syncing to", service.SatelliteAddr)
-
-			err := syncer.Watch(path, service)
-			if err != nil {
-				syncer.Close()
-				return nil, err
-			}
-
-			log.Println("cyan", "Uploading file changes to", service.Name+", check \"bowery logs\" for details.")
-			printService(service)
-		}
-	}
-
-	return syncer, nil
+	return syncer, services, nil
 }
 
 func tailLogs(state *db.State, logChan chan redis.Conn) (*syncWriter, error) {
@@ -326,8 +326,10 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*syncWriter, error) {
 	// Connect and write logs to file, ignore errors because syncing
 	// shouldn't depend on logs.
 	go func() {
-		var conn redis.Conn
-		var err error
+		var (
+			conn redis.Conn
+			err  error
+		)
 		i := 0
 
 		// Attempt to connect.

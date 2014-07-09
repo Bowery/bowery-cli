@@ -2,7 +2,6 @@
 package cmds
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -16,11 +15,15 @@ import (
 )
 
 func init() {
-	Cmds["destroy"] = &Cmd{destroyRun, "destroy <id or name>", "Destroy an application and its services.", ""}
+	Cmds["destroy"] = &Cmd{
+		Run:   destroyRun,
+		Usage: "destroy <id or name>",
+		Short: "Destroy an application and its services.",
+	}
 }
 
 func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
-	force := flag.Lookup("force").Value.String()
+	force := Cmds["destroy"].Force
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
 			"Usage: bowery "+Cmds["destroy"].Usage, "\n\n"+Cmds["destroy"].Short)
@@ -51,7 +54,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	}
 
 	// Ask for confirmation to delete.
-	if force != "true" {
+	if !force {
 		ok, err := prompt.Ask("Are you sure you want to delete this app")
 		if err != nil {
 			rollbar.Report(err)

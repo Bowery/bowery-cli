@@ -10,7 +10,11 @@ import (
 )
 
 func init() {
-	Cmds["apps"] = &Cmd{appsRun, "apps", "List all of your Bowery Apps.", ""}
+	Cmds["apps"] = &Cmd{
+		Run:   appsRun,
+		Usage: "apps",
+		Short: "List all of your Bowery Apps.",
+	}
 }
 
 func appsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

@@ -13,7 +13,11 @@ import (
 )
 
 func init() {
-	cmd := &Cmd{configRun, "config <key> [value]", "Set custom configuration options.", ""}
+	cmd := &Cmd{
+		Run:   configRun,
+		Usage: "config <key> [value]",
+		Short: "Set custom configuration options.",
+	}
 	cmd.Description = "Sets custom configuration options for connecting to Bowery." +
 		"\n\nCurrent config options are:" +
 		"\n  host  - The host bowery is running on" +
@@ -26,7 +30,8 @@ func configRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	var err error
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
-			"Usage: bowery", Cmds["config"].Usage, "\n\n"+Cmds["config"].Short)
+			"Usage: bowery", Cmds["config"].Usage, "\n\n"+Cmds["config"].Short+"\n")
+		fmt.Fprintln(os.Stderr, "Keys:\n  host\n  redis")
 		return 2
 	}
 

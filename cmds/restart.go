@@ -16,7 +16,11 @@ import (
 )
 
 func init() {
-	Cmds["restart"] = &Cmd{restartRun, "restart <name>", "Restart a service.", ""}
+	Cmds["restart"] = &Cmd{
+		Run:   restartRun,
+		Usage: "restart <name>",
+		Short: "Restart a service.",
+	}
 }
 
 func restartRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {

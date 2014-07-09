@@ -15,7 +15,11 @@ import (
 )
 
 func init() {
-	Cmds["errors"] = &Cmd{errorsRun, "errors [id]", "Get information on an error.", ""}
+	Cmds["errors"] = &Cmd{
+		Run:   errorsRun,
+		Usage: "errors [id]",
+		Short: "Get information on an error.",
+	}
 }
 
 func errorsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
