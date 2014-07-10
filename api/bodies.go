@@ -1,5 +1,5 @@
 // Copyright 2013-2014 Bowery, Inc.
-package requests
+package api
 
 import (
 	"github.com/Bowery/bowery/db"
@@ -26,12 +26,4 @@ type BuildAppReq struct {
 	Provider string               `json:"provider"`
 	App      *schemas.Application `json:"app"`
 	Token    string               `json:"token"`
-}
-
-// LoginReq contains fields for request bodies that user common login info
-// such as email/password.
-type LoginReq struct {
-	Name     string `json:"name,omitempty"` // Only some use name.
-	Email    string `json:"email"`
-	Password string `json:"password"`
 }

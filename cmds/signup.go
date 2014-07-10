@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Bowery/bowery/broome"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/prompt"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
@@ -75,7 +75,7 @@ func signupRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		return 1
 	}
 
-	developer, err := requests.CreateDeveloper(name, email, pass)
+	developer, err := broome.CreateDeveloper(name, email, pass)
 	if err != nil {
 		if err == errors.ErrDeveloperExists {
 			log.Println("yellow", err)

@@ -21,7 +21,8 @@ func init() {
 	cmd.Description = "Sets custom configuration options for connecting to Bowery." +
 		"\n\nCurrent config options are:" +
 		"\n  host  - The host bowery is running on" +
-		"\n  redis - The host for a Redis connection"
+		"\n  redis - The host for a Redis connection" +
+		"\n  provider - The system running bowery."
 
 	Cmds["config"] = cmd
 }
@@ -37,7 +38,7 @@ func configRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 
 	value := ""
 	key := args[0]
-	if key != "host" && key != "redis" {
+	if key != "host" && key != "redis" && key != "provider" {
 		rollbar.Report(errors.ErrInvalidConfigKey)
 		return 1
 	}

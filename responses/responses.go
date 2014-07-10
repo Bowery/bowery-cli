@@ -1,7 +1,9 @@
 // Copyright 2013-2014 Bowery, Inc.
-package requests
+package responses
 
 import (
+	"strings"
+
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/gopackages/schemas"
 )
@@ -63,4 +65,20 @@ type ImageTypeRes struct {
 type RestartRes struct {
 	*Res
 	Service *schemas.Service `json:"service"`
+}
+
+// isRefusedConn checks if a connection was refused.
+func IsRefusedConn(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := err.Error()
+
+	// Another option is to inspect the error tree until we get to a syscall
+	// but that is OS dependent so this is easier.
+	if strings.Contains(msg, "connection refused") || strings.Contains(msg, "refused") {
+		return true
+	}
+
+	return false
 }

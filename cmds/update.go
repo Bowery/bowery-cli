@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 
 	"bitbucket.org/kardianos/osext"
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/keen"
@@ -26,7 +26,7 @@ func init() {
 func updateRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	keen.AddEvent("cli update", map[string]string{"installed": version.Version})
 
-	ver, err := requests.GetVersion()
+	ver, err := api.GetVersion()
 	if err != nil {
 		rollbar.Report(err)
 		return 1
@@ -38,7 +38,7 @@ func updateRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 	log.Println("yellow", "Bowery is out of date. Updating to", ver, "now...")
 
-	newVer, err := requests.DownloadNewVersion(ver)
+	newVer, err := api.DownloadNewVersion(ver)
 	if err != nil {
 		rollbar.Report(err)
 		return 1

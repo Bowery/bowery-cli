@@ -12,16 +12,16 @@ import (
 	"time"
 
 	"github.com/Bowery/bowery/api"
+	"github.com/Bowery/bowery/broome"
 	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/delancey"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/bowery/sync"
 	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/keen"
 	"github.com/Bowery/gopackages/schemas"
-
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -45,7 +45,7 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	signal.Notify(signals, os.Interrupt, os.Kill)
 	defer signal.Stop(signals)
 
-	ver, err := requests.GetVersion()
+	ver, err := api.GetVersion()
 	if err != nil {
 		rollbar.Report(err)
 		return 1
@@ -69,7 +69,7 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 		rollbar.Report(err)
 		return 1
 	}
-	defer requests.Disconnect(dev.Token)
+	defer api.Disconnect(dev.Token)
 
 	syncer, servicesUploading, err := initiateSync(state)
 	if err != nil {
@@ -202,7 +202,7 @@ func updateOrCreateApp(dev *db.Developer) (*db.State, error) {
 	state.Config = services.Data
 
 	// Connect and retrieve new state.
-	err = requests.Connect(state)
+	err = api.Connect(state)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,7 @@ func initiateSync(state *db.State) (*sync.Syncer, []*schemas.Service, error) {
 		var err error
 		i := 0
 		for i < 1000 {
-			err = requests.SatelliteCheckHealth(service.SatelliteAddr)
+			err = delancey.CheckHealth(service.SatelliteAddr)
 			if err == nil {
 				break
 			}
@@ -334,7 +334,7 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*syncWriter, error) {
 
 		// Attempt to connect.
 		for i < 1000 {
-			conn, err = redis.Dial("tcp", api.RedisPath)
+			conn, err = redis.Dial("tcp", log.RedisPath)
 			if err == nil {
 				logChan <- conn
 				break
@@ -346,11 +346,11 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*syncWriter, error) {
 
 		// No successful connection so just forget it.
 		if conn == nil {
-			log.Debug("Couldn't connect to Redis", api.RedisPath)
+			log.Debug("Couldn't connect to Redis", log.RedisPath)
 			return
 		}
 		pubsub := redis.PubSubConn{Conn: conn}
-		log.Debug("Connected to Redis", api.RedisPath)
+		log.Debug("Connected to Redis", log.RedisPath)
 
 		write := func(data []byte) error {
 			buf := bytes.NewBuffer(data)
@@ -394,7 +394,7 @@ func apiStatus(token string) {
 
 	for {
 		<-time.After(5 * time.Second)
-		err := requests.DevPing(token)
+		err := broome.DevPing(token)
 		if err != nil && connected {
 			connected = false
 			log.Fprintln(os.Stderr, "red", errors.ErrCantConnect, "Attempting to re-connect...")

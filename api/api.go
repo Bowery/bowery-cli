@@ -10,26 +10,18 @@ import (
 )
 
 var (
-	env         = os.Getenv("ENV")
-	host        = os.Getenv("HOST")
-	boweryApi   = os.Getenv("API_ADDR")
-	broomeApi   = os.Getenv("BROOME_ADDR")
-	boweryRedis = os.Getenv("REDIS_ADDR")
+	env       = os.Getenv("ENV")
+	host      = os.Getenv("HOST")
+	boweryApi = os.Getenv("API_ADDR")
 )
 
 // Base endpoints for api and Redis.
 var (
-	BasePath   = "http://api.bowery.io"
-	BroomePath = "http://broome.io"
-	RedisPath  = "ec2-23-22-237-84.compute-1.amazonaws.com:6379"
+	BasePath = "http://api.bowery.io"
 )
 
 // Paths that are used to call api endpoints.
 const (
-	CreateDeveloperPath    = "/developers"
-	CreateTokenPath        = "/developers/token"
-	MePath                 = "/developers/me?token={token}"
-	CheckPath              = "/developers/me/check?token={token}"
 	AppPath                = "/applications/{id}"
 	DestroyPath            = "/applications/{id}/destroy"
 	AppsPath               = "/developers/applications?token={token}"
@@ -43,7 +35,6 @@ const (
 	DownloadPath           = "http://dl.bintray.com/bowery/bowery/{version}_{os}_{arch}.zip"
 	BoweryImagesSearchPath = "/images/search/{name}"
 	BoweryImagesCheckPath  = "/images/{name}"
-	ResetPasswordPath      = "/reset/{email}"
 )
 
 func init() {
@@ -52,19 +43,9 @@ func init() {
 			host = "10.0.0.15"
 		}
 		BasePath = "http://" + host + ":3000"
-		BroomePath = "http://127.0.0.1:4000"
-		RedisPath = host + ":6379"
 
 		if boweryApi != "" {
 			BasePath = "http://" + boweryApi
-		}
-
-		if broomeApi != "" {
-			BroomePath = "http://" + broomeApi
-		}
-
-		if boweryRedis != "" {
-			RedisPath = boweryRedis
 		}
 	}
 
@@ -73,11 +54,6 @@ func init() {
 		h, ok := dev.Config["host"]
 		if ok && h != "" {
 			BasePath = h
-		}
-
-		redis, ok := dev.Config["redis"]
-		if ok && redis != "" {
-			RedisPath = redis
 		}
 	}
 }

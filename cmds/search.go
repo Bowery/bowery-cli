@@ -2,8 +2,8 @@
 package cmds
 
 import (
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/log"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
@@ -27,7 +27,7 @@ func searchRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 			name = "."
 		}
 
-		images, err := requests.SearchImages(name)
+		images, err := api.SearchImages(name)
 		if err != nil {
 			rollbar.Report(err)
 			return 1

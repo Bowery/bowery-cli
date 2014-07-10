@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/prompt"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
@@ -101,7 +101,7 @@ func addServices(services *db.Services, names ...string) error {
 			}
 
 			if image != "base" {
-				err := requests.FindImage(image)
+				err := api.FindImage(image)
 				if err != nil && err != errors.ErrNoImageFound {
 					return err
 				}

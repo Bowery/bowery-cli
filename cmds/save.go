@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/prompt"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 	"github.com/Bowery/gopackages/schemas"
@@ -81,7 +81,7 @@ func saveRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	log.Println("yellow", "A new image is being created and saved to our registry...")
 	log.Println("yellow", "This may take a couple minutes.")
 
-	err = requests.SaveService(state, dev, service.Name, service.PublicAddr, imageName, imageDesc)
+	err = api.SaveService(state, dev, service.Name, service.PublicAddr, imageName, imageDesc)
 	if err != nil {
 		errmsg := err.Error()
 		if errmsg == imageName+" is an invalid service name" ||

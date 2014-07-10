@@ -11,9 +11,10 @@ import (
 	"time"
 
 	"github.com/Bowery/bowery/db"
+	"github.com/Bowery/bowery/delancey"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/log"
-	"github.com/Bowery/bowery/requests"
+
 	"github.com/Bowery/bowery/tar"
 	"github.com/Bowery/gopackages/schemas"
 )
@@ -243,7 +244,7 @@ func (watcher *Watcher) Upload() error {
 		}
 
 		// Attempt to upload the file to the services satellite.
-		err = requests.SatelliteUpload(watcher.Service.SatelliteAddr, watcher.Service.Name, file)
+		err = delancey.Upload(watcher.Service.SatelliteAddr, watcher.Service.Name, file)
 		if err == nil {
 			return nil
 		}
@@ -256,7 +257,7 @@ func (watcher *Watcher) Upload() error {
 
 // Update updates a path to the service.
 func (watcher *Watcher) Update(name, status string) error {
-	return requests.SatelliteUpdate(watcher.Service.SatelliteAddr, watcher.Service.Name,
+	return delancey.Update(watcher.Service.SatelliteAddr, watcher.Service.Name,
 		filepath.Join(watcher.Path, name), name, status)
 }
 

@@ -2,9 +2,9 @@
 package cmds
 
 import (
+	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/log"
-	"github.com/Bowery/bowery/requests"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
 )
@@ -26,7 +26,7 @@ func appsRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 
 	// Fetch apps.
 	log.Print("magenta", "Requesting apps... ")
-	apps, err := requests.GetApps(dev.Token)
+	apps, err := api.GetApps(dev.Token)
 	if err != nil {
 		rollbar.Report(err)
 		return 1
