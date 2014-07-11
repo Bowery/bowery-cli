@@ -82,6 +82,9 @@ func Upload(url, serviceName string, file *os.File) error {
 		if err == nil {
 			err = writer.WriteField("start", service.Start)
 		}
+		if err == nil {
+			err = writer.WriteField("path", service.Path)
+		}
 	}
 	if err == nil {
 		err = writer.Close()
