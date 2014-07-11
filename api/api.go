@@ -36,7 +36,6 @@ const (
 	RemovePath             = "/services/{dockerid}/remove?token={token}"
 	DownloadPath           = "http://download.bowery.io/{version}_{os}_{arch}.zip"
 	BoweryImagesSearchPath = "/images/search/{name}"
-	BoweryImagesCheckPath  = "/images/{name}"
 )
 
 func init() {

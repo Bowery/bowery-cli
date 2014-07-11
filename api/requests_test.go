@@ -228,23 +228,6 @@ func searchImagesHandler(rw http.ResponseWriter, req *http.Request) {
 	rw.Write(body)
 }
 
-func TestFindImageSuccessful(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(findImageHandler))
-	defer server.Close()
-	BasePath = server.URL
-
-	err := FindImage("testimage")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func findImageHandler(rw http.ResponseWriter, req *http.Request) {
-	res := responses.Res{Status: "found"}
-	body, _ := json.Marshal(res)
-	rw.Write(body)
-}
-
 func TestHealthzSuccessful(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(healthzHandler))
 	defer server.Close()

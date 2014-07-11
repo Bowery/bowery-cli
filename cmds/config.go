@@ -20,9 +20,9 @@ func init() {
 	}
 	cmd.Description = "Sets custom configuration options for connecting to Bowery." +
 		"\n\nCurrent config options are:" +
-		"\n  host  - The host bowery is running on" +
+		"\n  host  - The host Bowery is running on" +
 		"\n  redis - The host for a Redis connection" +
-		"\n  provider - The system running bowery."
+		"\n  provider - The system running Bowery."
 
 	Cmds["config"] = cmd
 }

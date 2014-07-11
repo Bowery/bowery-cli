@@ -70,6 +70,11 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	}
 	defer api.Disconnect(dev.Token)
 
+	keen.AddEvent("bowery connect", map[string]interface{}{
+		"user": dev,
+		"app":  state,
+	})
+
 	syncer, servicesUploading, err := initiateSync(state)
 	if err != nil {
 		rollbar.Report(err)
@@ -117,11 +122,6 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	}()
 
 	go apiStatus(dev.Token)
-
-	keen.AddEvent("bowery connect", map[string]interface{}{
-		"user": dev,
-		"app":  state,
-	})
 
 	// Watch for various events.
 	go func() {

@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/prompt"
@@ -89,39 +88,12 @@ func addServices(services *db.Services, names ...string) error {
 		}
 
 		// Ask for image name
-		validImage := false
-		image := ""
 		if !includedName {
 			log.Println("magenta", "What image would you like to use? (e.g. php, mongodb, ruby, node, etc.)")
 		}
-		for validImage == false {
-			image, err = prompt.Basic("Image", false)
-			if err != nil {
-				return err
-			}
-
-			if image != "base" {
-				err := api.FindImage(image)
-				if err != nil && err != errors.ErrNoImageFound {
-					return err
-				}
-			}
-
-			if err == errors.ErrNoImageFound {
-				ok, err = prompt.Ask("Invalid image type. Would you like to use the base image")
-				if err != nil {
-					return err
-				}
-
-				if !ok {
-					log.Println("yellow", "Try another image. Search for them using `bowery search`.")
-					continue
-				}
-
-				image = "base"
-			}
-
-			validImage = true
+		image, err := prompt.BasicDefault("Image", "bowery/base")
+		if err != nil {
+			return err
 		}
 
 		// Ask for path

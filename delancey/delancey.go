@@ -176,22 +176,23 @@ func Update(url, serviceName, fullPath, name, status string) error {
 		return err
 	}
 
-	if service := state.Config[serviceName]; service != nil {
-		writer.WriteField("init", service.Init)
-		writer.WriteField("build", service.Build)
-		writer.WriteField("test", service.Test)
-		writer.WriteField("start", service.Start)
-
-		if service.Env != nil {
-			envData, err := json.Marshal(service.Env)
-			if err != nil {
-				return err
-			}
-			err = writer.WriteField("env", string(envData))
+	service := state.Config[serviceName]
+	if service != nil {
+		err = writer.WriteField("init", service.Init)
+		if err == nil {
+			err = writer.WriteField("build", service.Build)
+		}
+		if err == nil {
+			err = writer.WriteField("test", service.Test)
+		}
+		if err == nil {
+			err = writer.WriteField("start", service.Start)
 		}
 	}
-
-	if err = writer.Close(); err != nil {
+	if err == nil {
+		err = writer.Close()
+	}
+	if err != nil {
 		return err
 	}
 

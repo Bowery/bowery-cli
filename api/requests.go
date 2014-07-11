@@ -363,29 +363,6 @@ func SearchImages(name string) ([]*schemas.Image, error) {
 	return imageRes.Images, nil
 }
 
-// FindImage checks if an image name exists, returning nil if found.
-func FindImage(name string) error {
-	endpoint := BasePath + strings.Replace(BoweryImagesCheckPath, "{name}", name, -1)
-	res, err := http.Get(endpoint)
-	if err != nil {
-		return errors.NewStackError(err)
-	}
-	defer res.Body.Close()
-
-	imageRes := new(responses.Res)
-	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(imageRes)
-	if err != nil {
-		return errors.NewStackError(err)
-	}
-
-	if imageRes.Status == "found" {
-		return nil
-	}
-
-	return errors.ErrNoImageFound
-}
-
 // Healthz checks to see if api is up and running.
 func Healthz() error {
 	res, err := http.Get(BasePath + HealthzPath)
