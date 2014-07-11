@@ -32,7 +32,7 @@ func configRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	if len(args) <= 0 {
 		fmt.Fprintln(os.Stderr,
 			"Usage: bowery", Cmds["config"].Usage, "\n\n"+Cmds["config"].Short+"\n")
-		fmt.Fprintln(os.Stderr, "Keys:\n  host\n  redis")
+		fmt.Fprintln(os.Stderr, "Keys:\n  host\n  redis\n  provider")
 		return 2
 	}
 
