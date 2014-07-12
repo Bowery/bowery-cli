@@ -262,17 +262,18 @@ func initiateSync(state *db.State) (*sync.Syncer, []*schemas.Service, error) {
 
 		// Ensure the path exists and is a directory.
 		if config.Path != "" {
-			info, err := os.Lstat(config.Path)
+			localPath := strings.Split(config.Path, ":")[0]
+			info, err := os.Lstat(localPath)
 			if err != nil {
 				if os.IsNotExist(err) {
-					return nil, nil, errors.Newf(errors.ErrPathNotFoundTmpl, service.Name, config.Path)
+					return nil, nil, errors.Newf(errors.ErrPathNotFoundTmpl, service.Name, localPath)
 				}
 
 				return nil, nil, err
 			}
 
 			if !info.IsDir() {
-				return nil, nil, errors.Newf(errors.ErrPathNotDirTmpl, service.Name, config.Path)
+				return nil, nil, errors.Newf(errors.ErrPathNotDirTmpl, service.Name, localPath)
 			}
 		}
 
@@ -301,7 +302,7 @@ func initiateSync(state *db.State) (*sync.Syncer, []*schemas.Service, error) {
 			return nil, nil, errors.NewStackError(errors.ErrContainerConnect)
 		}
 
-		syncer.Watch(config.Path, service)
+		syncer.Watch(strings.Split(config.Path, ":")[0], service)
 		if config.Path != "" {
 			log.Println("cyan", "Uploading file changes and running commands for", service.Name+".")
 		} else {

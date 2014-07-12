@@ -133,6 +133,12 @@ func addServices(services *db.Services, names ...string) error {
 			return err
 		}
 
+		// Ask for Remote Path
+		if !includedName {
+			log.Println("magenta", "Where should we sync the files to on the remote machine?")
+		}
+		root, err := prompt.Basic("Remote Path", false)
+
 		// Ask for ports
 		if !includedName {
 			log.Println("magenta", "What ports would you like exposed? Enter comma separated. Ports 22 and 80 are included by default, 3001 is reserved.")
@@ -183,6 +189,10 @@ func addServices(services *db.Services, names ...string) error {
 		test, err := prompt.Basic("Test Command", false)
 		if err != nil {
 			return err
+		}
+
+		if path != "" && root != "" {
+			path = path + ":" + root
 		}
 
 		log.Debug("Adding service", "name", name, "image", image, "path", path, "ports", portsList, "start", start, "build", build, "test", test)
