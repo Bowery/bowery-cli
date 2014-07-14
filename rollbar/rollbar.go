@@ -133,7 +133,7 @@ func (client *Client) Report(err error) error {
 
 	dev, _ := db.GetDeveloper()
 	if dev != nil && dev.Developer != nil {
-		reqBody.Data.Custom.ID = dev.Developer.ID
+		reqBody.Data.Custom.ID = dev.Developer.ID.String()
 		reqBody.Data.Custom.Email = dev.Developer.Email
 		reqBody.Data.Custom.Name = dev.Developer.Name
 	}
