@@ -58,7 +58,7 @@ func init() {
 		&schemas.Application{
 			ID:          "5303a1636462d4d468000002",
 			Name:        "someapp",
-			DeveloperID: TestDeveloper.ID,
+			DeveloperID: TestDeveloper.ID.String(),
 			UpdatedAt:   1398102273378,
 			Services:    []*schemas.Service{},
 		},
@@ -77,7 +77,7 @@ func init() {
 		ID:          "5303a1636462d4d468000003",
 		Name:        "testimage",
 		Description: "desc",
-		CreatorID:   TestDeveloper.ID,
+		CreatorID:   TestDeveloper.ID.String(),
 		UpdatedAt:   1398102273378,
 	}
 
@@ -118,7 +118,7 @@ func GetAppsSuccessful(t *testing.T) {
 	}
 
 	for _, app := range apps {
-		if app.DeveloperID != dev.ID {
+		if app.DeveloperID != dev.ID.String() {
 			t.Error("Application does not belong to developer.")
 		}
 	}
