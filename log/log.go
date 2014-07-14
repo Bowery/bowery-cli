@@ -30,7 +30,7 @@ func init() {
 	devId := "0"
 	dev, _ := db.GetDeveloper()
 	if dev != nil && dev.Developer != nil {
-		devId = dev.Developer.ID
+		devId = dev.Developer.ID.String()
 	}
 
 	if redisPathEnv != "" {

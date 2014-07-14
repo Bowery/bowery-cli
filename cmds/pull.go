@@ -73,7 +73,7 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 	}
 
-	if dev.Developer.ID == app.DeveloperID {
+	if dev.Developer.ID.String() == app.DeveloperID {
 		log.Debug("Current developer owns application.")
 		isAppOwner = true
 	}
