@@ -101,6 +101,12 @@ func signupRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 
 	log.Println("magenta", "Welcome", developer.Name+"!", "To get started run",
 		"`bowery connect`\nwithin your applications directory.")
-	log.Println("magenta", "\nYou can also check out the example app at https://github.com/Bowery/example\nor run `bowery help`.")
+	log.Println("", "")
+	log.Println("magenta", "You can also check out our example apps:")
+	log.Println("", "")
+	log.Println("magenta", "  Node.js  https://github.com/Bowery/node-example")
+	log.Println("magenta", "  Golang   https://github.com/Bowery/go-example")
+	log.Println("magenta", "  Erlang   https://github.com/Bowery/erlang-example")
+	log.Println("magenta", "  Spring   https://github.com/Bowery/spring-example")
 	return 0
 }
