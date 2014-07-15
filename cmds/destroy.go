@@ -46,7 +46,7 @@ func destroyRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	log.Debug("Found app successfully:", app.ID)
 
 	// Make sure developer owns app.
-	if dev.Developer.ID.String() == app.DeveloperID {
+	if dev.Developer.ID.Hex() == app.DeveloperID {
 		log.Debug("Current developer owns application.")
 	} else {
 		log.Println("yellow", "You must be the owner of this application to perform this action.")
