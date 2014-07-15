@@ -11,13 +11,14 @@ import (
 
 // Service describes a service.
 type Service struct {
-	Image string        `json:"image,omitempty"`
-	Path  string        `json:"path,omitempty"`
-	Ports []interface{} `json:"ports,omitempty"`
-	Start string        `json:"start,omitempty"`
-	Build string        `json:"build,omitempty"`
-	Test  string        `json:"test,omitempty"`
-	Init  string        `json:"init,omitempty"`
+	Image string            `json:"image,omitempty"`
+	Path  string            `json:"path,omitempty"`
+	Ports []interface{}     `json:"ports,omitempty"`
+	Start string            `json:"start,omitempty"`
+	Build string            `json:"build,omitempty"`
+	Test  string            `json:"test,omitempty"`
+	Init  string            `json:"init,omitempty"`
+	Env   map[string]string `json:"env,omitempty"`
 }
 
 // Services contains a map of services by name.

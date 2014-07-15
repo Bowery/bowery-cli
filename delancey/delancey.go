@@ -85,6 +85,13 @@ func Upload(url, serviceName string, file *os.File) error {
 		if err == nil {
 			err = writer.WriteField("path", service.Path)
 		}
+		if err == nil && service.Env != nil {
+			envData, err := json.Marshal(service.Env)
+			if err != nil {
+				return err
+			}
+			err = writer.WriteField("env", string(envData))
+		}
 	}
 	if err == nil {
 		err = writer.Close()
@@ -174,6 +181,14 @@ func Update(url, serviceName, fullPath, name, status string) error {
 		writer.WriteField("build", service.Build)
 		writer.WriteField("test", service.Test)
 		writer.WriteField("start", service.Start)
+
+		if service.Env != nil {
+			envData, err := json.Marshal(service.Env)
+			if err != nil {
+				return err
+			}
+			err = writer.WriteField("env", string(envData))
+		}
 	}
 
 	if err = writer.Close(); err != nil {

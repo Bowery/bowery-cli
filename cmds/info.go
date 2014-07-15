@@ -35,9 +35,9 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 
 	if ENV == "development" {
-		log.Println("", "Developer(development mode):")
+		log.Println("magenta", "Developer(development mode):")
 	} else {
-		log.Println("", "Developer:")
+		log.Println("magenta", "Developer:")
 	}
 	if devErr != nil {
 		log.Println("yellow", "  Not logged in.")
@@ -46,7 +46,7 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		log.Println("", "  Name:", dev.Developer.Name)
 	}
 
-	log.Println("", "\nConfig:")
+	log.Println("magenta", "\nConfig:")
 	if dev.Config == nil || len(dev.Config) <= 0 {
 		log.Println("yellow", "  No custom configuration.")
 	} else {
@@ -57,7 +57,7 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 	}
 
-	log.Println("", "\nApplication:")
+	log.Println("magenta", "\nApplication:")
 	if err == errors.ErrNotConnected {
 		log.Println("yellow", "  No connected application in this directory.")
 	} else {
@@ -101,6 +101,12 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 			}
 			if service.Start != "" {
 				log.Println("", "    Start:", service.Start)
+			}
+			if len(service.Env) > 0 {
+				log.Println("", "    Env:")
+				for key, value := range service.Env {
+					log.Println("", fmt.Sprintf("      %s: %s", key, value))
+				}
 			}
 		}
 	}
