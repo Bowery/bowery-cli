@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/sys"
 	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/schemas"
+	"github.com/Bowery/gopackages/sys"
 )
 
 var env = os.Getenv("ENV")
