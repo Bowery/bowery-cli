@@ -89,8 +89,8 @@ var errorCodes = []Error{
 	Error{
 		Code:  "12",
 		Title: ErrOutOfDate.Error(),
-		Description: "A later version of Bowery is available. For the time being, it is required\n" +
-			"that the latest cli is used.",
+		Description: "A later version of Bowery is available. It is recommended you have the\n" +
+			"most up to date version.\n",
 	},
 	Error{
 		Code:        "13",

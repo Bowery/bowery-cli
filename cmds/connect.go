@@ -52,8 +52,7 @@ func connectRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int 
 	}
 
 	if VersionOutOfDate(version.Version, ver) {
-		log.Fprintln(os.Stderr, "red", errors.ErrOutOfDate)
-		return 1
+		log.Println("yellow", errors.ErrOutOfDate)
 	}
 
 	dev, err := getDeveloper()
