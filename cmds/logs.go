@@ -8,9 +8,9 @@ import (
 
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/log"
 
 	"github.com/ActiveState/tail"
 )

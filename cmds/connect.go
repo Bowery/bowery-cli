@@ -16,11 +16,11 @@ import (
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/delancey"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/bowery/sync"
 	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/log"
 	"github.com/Bowery/gopackages/schemas"
 	"github.com/garyburd/redigo/redis"
 )
@@ -335,7 +335,7 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*syncWriter, error) {
 
 		// Attempt to connect.
 		for i < 1000 {
-			conn, err = redis.Dial("tcp", log.RedisPath)
+			conn, err = redis.Dial("tcp", api.RedisPath)
 			if err == nil {
 				logChan <- conn
 				break
@@ -347,11 +347,11 @@ func tailLogs(state *db.State, logChan chan redis.Conn) (*syncWriter, error) {
 
 		// No successful connection so just forget it.
 		if conn == nil {
-			log.Debug("Couldn't connect to Redis", log.RedisPath)
+			log.Debug("Couldn't connect to Redis", api.RedisPath)
 			return
 		}
 		pubsub := redis.PubSubConn{Conn: conn}
-		log.Debug("Connected to Redis", log.RedisPath)
+		log.Debug("Connected to Redis", api.RedisPath)
 
 		write := func(data []byte) error {
 			buf := bytes.NewBuffer(data)

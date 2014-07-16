@@ -13,9 +13,8 @@ import (
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/delancey"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
-
 	"github.com/Bowery/bowery/tar"
+	"github.com/Bowery/gopackages/log"
 	"github.com/Bowery/gopackages/schemas"
 )
 
