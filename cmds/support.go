@@ -3,8 +3,8 @@ package cmds
 
 import (
 	"github.com/Bowery/bowery/rollbar"
-	"github.com/Bowery/bowery/sys"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/sys"
 )
 
 func init() {
