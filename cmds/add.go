@@ -137,7 +137,7 @@ func addServices(services *db.Services, names ...string) error {
 		if !includedName {
 			log.Println("magenta", "Where should we sync the files to on the remote machine?")
 		}
-		root, err := prompt.Basic("Remote Path", false)
+		root, err := prompt.BasicDefault("Remote Path", "/application")
 
 		// Ask for ports
 		if !includedName {
@@ -192,7 +192,7 @@ func addServices(services *db.Services, names ...string) error {
 		}
 
 		if path != "" && root != "" {
-			path = path + ":" + root
+			path += ":" + root
 		}
 
 		log.Debug("Adding service", "name", name, "image", image, "path", path, "ports", portsList, "start", start, "build", build, "test", test)
