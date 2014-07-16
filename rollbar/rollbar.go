@@ -13,8 +13,8 @@ import (
 
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/version"
+	"github.com/Bowery/gopackages/log"
 )
 
 var debug = os.Getenv("DEBUG")

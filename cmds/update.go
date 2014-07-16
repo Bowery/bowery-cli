@@ -9,10 +9,10 @@ import (
 	"bitbucket.org/kardianos/osext"
 	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/log"
 )
 
 func init() {

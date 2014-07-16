@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/bowery/version"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/log"
 )
 
 func init() {

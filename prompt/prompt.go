@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
+	"github.com/Bowery/gopackages/log"
 )
 
 // Basic gets input and if required tests to ensure input was given.

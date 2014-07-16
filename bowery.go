@@ -9,9 +9,9 @@ import (
 	"bitbucket.org/kardianos/osext"
 	. "github.com/Bowery/bowery/cmds"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/rollbar"
 	"github.com/Bowery/gopackages/keen"
+	"github.com/Bowery/gopackages/log"
 )
 
 var (

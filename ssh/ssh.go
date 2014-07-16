@@ -10,8 +10,8 @@ import (
 	"code.google.com/p/go.crypto/ssh"
 	"code.google.com/p/go.crypto/ssh/terminal"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/log"
 	"github.com/Bowery/bowery/prompt"
+	"github.com/Bowery/gopackages/log"
 	"github.com/Bowery/gopackages/schemas"
 )
 
