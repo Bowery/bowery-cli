@@ -14,6 +14,7 @@ import (
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/version"
+	pkgerr "github.com/Bowery/gopackages/errors"
 	"github.com/Bowery/gopackages/log"
 )
 
@@ -53,7 +54,7 @@ type Data struct {
 
 // body contains a stack trace for the request.
 type body struct {
-	Trace *errors.Trace `json:"trace"`
+	Trace *pkgerr.Trace `json:"trace"`
 }
 
 // server contains the systems host.
@@ -90,8 +91,8 @@ func (client *Client) Report(err error) error {
 	log.Fprintln(os.Stderr, "red", err)
 
 	// Don't report non stack errors.
-	se, ok := err.(*errors.StackError)
-	if !ok {
+	se := errors.IsStackError(err)
+	if se == nil {
 		return nil
 	}
 
