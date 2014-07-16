@@ -13,10 +13,10 @@ import (
 	"github.com/Bowery/bowery/errors"
 	"github.com/Bowery/bowery/prompt"
 	"github.com/Bowery/bowery/rollbar"
-	"github.com/Bowery/bowery/tar"
 	"github.com/Bowery/gopackages/keen"
 	"github.com/Bowery/gopackages/log"
 	"github.com/Bowery/gopackages/schemas"
+	"github.com/Bowery/gopackages/tar"
 )
 
 func init() {

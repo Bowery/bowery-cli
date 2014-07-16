@@ -13,9 +13,9 @@ import (
 	"github.com/Bowery/bowery/db"
 	"github.com/Bowery/bowery/delancey"
 	"github.com/Bowery/bowery/errors"
-	"github.com/Bowery/bowery/tar"
 	"github.com/Bowery/gopackages/log"
 	"github.com/Bowery/gopackages/schemas"
+	"github.com/Bowery/gopackages/tar"
 )
 
 // Event describes a file event and the associated service name.
@@ -207,8 +207,13 @@ func (watcher *Watcher) Upload() error {
 	path := watcher.uploadPath()
 	i := 0
 
+	ignores, err := db.GetIgnores(watcher.Path)
+	if err != nil {
+		return watcher.wrapErr(err)
+	}
+
 	if watcher.Path != "" {
-		upload, err := tar.Tar(watcher.Path)
+		upload, err := tar.Tar(watcher.Path, ignores)
 		if err != nil {
 			return watcher.wrapErr(err)
 		}
