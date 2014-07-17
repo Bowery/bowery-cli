@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/Bowery/bowery/api"
 	"github.com/Bowery/bowery/db"
@@ -134,7 +135,7 @@ func pullRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 		}
 
 		// Create the path for the service, and download its files.
-		path := services.Data[service.Name].Path
+		path := strings.Split(services.Data[service.Name].Path, ":")[0]
 		if path != "" {
 			err = os.MkdirAll(path, 0777)
 			if err != nil {
