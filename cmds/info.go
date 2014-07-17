@@ -88,7 +88,12 @@ func infoRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 			log.Println("", "    URL:", url)
 			log.Println("", "    Image:", service.Image)
 			if service.Path != "" {
-				log.Println("", "    Path:", service.Path)
+				paths := strings.Split(service.Path, ":")
+
+				log.Println("", "    Path:", paths[0])
+				if len(paths) > 1 && paths[1] != "" {
+					log.Println("", "    Remote Path:", paths[1])
+				}
 			}
 			if len(service.Ports) > 0 {
 				log.Println("", fmt.Sprintf("    Ports: %v", service.Ports))
