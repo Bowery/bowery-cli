@@ -68,18 +68,6 @@ pushd ./pkg/${VERSIONDIR}/dist
 shasum -a256 * > ./${VERSIONDIR}_SHA256SUMS
 popd
 
-# TODO eventually remove this. you'll first need to upload a version that updates by looking at s3
-for ARCHIVE in ./pkg/${VERSION}/dist/*; do
-    ARCHIVE_NAME=$(basename ${ARCHIVE})
-
-    echo Uploading: $ARCHIVE_NAME from $ARCHIVE
-    curl \
-        -T ${ARCHIVE} \
-        -ustevekaliski:7683716684ff54cbebb896a92be8fa6749c17ba6 \
-        "https://api.bintray.com/content/bowery/bowery/bowery/${VERSION}/${ARCHIVE_NAME}"
-    echo
-done
-
 # Also send to s3
 for ARCHIVE in ./pkg/${VERSION}/dist/*; do
     ARCHIVE_NAME=$(basename ${ARCHIVE})
