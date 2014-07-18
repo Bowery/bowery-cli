@@ -7,6 +7,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -400,27 +401,29 @@ func Healthz() error {
 // DownloadNewVersion retrieves the version of bowery requested for the
 // current os/arch.
 // TODO (thebyrd) move this somewhere else
-func DownloadNewVersion(version string) (io.Reader, error) {
-	var buf bytes.Buffer
+func DownloadNewVersion(version string) (io.Reader, io.Reader, error) {
+	var binaryBuf bytes.Buffer
+	var releaseNotesBuf bytes.Buffer
+
 	downloadPath := strings.Replace(DownloadPath, "{version}", version, -1)
 	downloadPath = strings.Replace(downloadPath, "{os}", runtime.GOOS, -1)
 	downloadPath = strings.Replace(downloadPath, "{arch}", runtime.GOARCH, -1)
 
 	res, err := http.Get(downloadPath)
 	if err != nil {
-		return nil, errors.NewStackError(err)
+		return nil, nil, errors.NewStackError(err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.NewStackError(errors.New(res.Status))
+		return nil, nil, errors.NewStackError(errors.New(res.Status))
 	}
 
 	// Create a temp file to write zip to, the zip reader requires an
 	// offset reader.
 	temp, err := ioutil.TempFile("", "bowery_zip")
 	if err != nil {
-		return nil, errors.NewStackError(err)
+		return nil, nil, errors.NewStackError(err)
 	}
 	defer func() {
 		temp.Close()
@@ -429,44 +432,69 @@ func DownloadNewVersion(version string) (io.Reader, error) {
 
 	written, err := io.Copy(temp, res.Body)
 	if err != nil {
-		return nil, errors.NewStackError(err)
+		return nil, nil, errors.NewStackError(err)
 	}
 
 	reader, err := zip.NewReader(temp, written)
 	if err != nil {
-		return nil, errors.NewStackError(err)
+		return nil, nil, errors.NewStackError(err)
 	}
 
 	if len(reader.File) <= 0 {
-		return nil, errors.NewStackError(errors.ErrVersionDownload)
+		return nil, nil, errors.NewStackError(errors.ErrVersionDownload)
 	}
 
+	// Determine which file is the release notes and which
+	// is the binary.
+
+	binaryIndex := -1
+	releaseNotesIndex := -1
+
 	// Get the first file.
-	idx := -1
 	for i, header := range reader.File {
 		if header.FileInfo().IsDir() {
 			continue
 		}
 
-		idx = i
-		break
+		fileName := header.FileInfo().Name()
+		if fileName == "bowery" || fileName == "bowery.exe" {
+			binaryIndex = i
+		} else if fileName == fmt.Sprintf("%s.txt", version) {
+			releaseNotesIndex = i
+		}
+
+		if binaryIndex != -1 && releaseNotesIndex != -1 {
+			break
+		}
 	}
 
-	if idx < 0 {
-		return nil, errors.NewStackError(errors.ErrVersionDownload)
+	if binaryIndex < 0 || releaseNotesIndex < 0 {
+		return nil, nil, errors.NewStackError(errors.ErrVersionDownload)
 	}
 
-	// Assume the first file is the binary.
-	file, err := reader.File[idx].Open()
+	// Create buffer for binary.
+	binary, err := reader.File[binaryIndex].Open()
 	if err != nil {
-		return nil, errors.NewStackError(err)
+		return nil, nil, errors.NewStackError(err)
 	}
-	defer file.Close()
+	defer binary.Close()
 
-	_, err = io.Copy(&buf, file)
+	_, err = io.Copy(&binaryBuf, binary)
 	if err != nil {
-		return nil, errors.NewStackError(err)
+		return nil, nil, errors.NewStackError(err)
 	}
 
-	return &buf, nil
+	// Create buffer for release notes.
+	release, err := reader.File[releaseNotesIndex].Open()
+	if err != nil {
+		return nil, nil, errors.NewStackError(err)
+	}
+	defer release.Close()
+
+	_, err = io.Copy(&releaseNotesBuf, release)
+	if err != nil {
+		return nil, nil, errors.NewStackError(err)
+	}
+
+	return &binaryBuf, &releaseNotesBuf, nil
 }

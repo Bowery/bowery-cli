@@ -30,12 +30,22 @@ trap "kill 0" SIGINT SIGTERM EXIT
 # Make sure goxc is installed
 go get github.com/laher/goxc
 
+# Make sure release notes have been written
+releaseNotes="release/${VERSION}.txt"
+if [ ! -e $releaseNotes ]; then
+  echo "Must include release notes at ${DIR}/${releaseNotes}"
+  exit 1
+fi
+
+cp $releaseNotes ./
+
 # This function builds whatever directory we're in...
 goxc \
     -arch="$XC_ARCH" \
     -os="$XC_OS" \
     -d="${DIR}/pkg" \
     -pv="${VERSION}" \
+    -resources-include="${VERSION}.txt" \
     $XC_OPTS \
     go-install \
     xc
@@ -60,18 +70,6 @@ pushd ./pkg/${VERSIONDIR}/dist
 shasum -a256 * > ./${VERSIONDIR}_SHA256SUMS
 popd
 
-# TODO eventually remove this. you'll first need to upload a version that updates by looking at s3
-for ARCHIVE in ./pkg/${VERSION}/dist/*; do
-    ARCHIVE_NAME=$(basename ${ARCHIVE})
-
-    echo Uploading: $ARCHIVE_NAME from $ARCHIVE
-    curl \
-        -T ${ARCHIVE} \
-        -ustevekaliski:7683716684ff54cbebb896a92be8fa6749c17ba6 \
-        "https://api.bintray.com/content/bowery/bowery/bowery/${VERSION}/${ARCHIVE_NAME}"
-    echo
-done
-
 # Also send to s3
 for ARCHIVE in ./pkg/${VERSION}/dist/*; do
     ARCHIVE_NAME=$(basename ${ARCHIVE})
@@ -94,5 +92,8 @@ for ARCHIVE in ./pkg/${VERSION}/dist/*; do
         https://${bucket}.s3.amazonaws.com/${file}
     echo
 done
+
+# Cleanup
+rm "${VERSION}.txt"
 
 exit 0
