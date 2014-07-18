@@ -37,13 +37,15 @@ if [ ! -e $releaseNotes ]; then
   exit 1
 fi
 
+cp $releaseNotes ./
+
 # This function builds whatever directory we're in...
 goxc \
     -arch="$XC_ARCH" \
     -os="$XC_OS" \
     -d="${DIR}/pkg" \
     -pv="${VERSION}" \
-    -resources-include="release/${VERSION}.txt" \
+    -resources-include="${VERSION}.txt" \
     $XC_OPTS \
     go-install \
     xc
@@ -90,5 +92,8 @@ for ARCHIVE in ./pkg/${VERSION}/dist/*; do
         https://${bucket}.s3.amazonaws.com/${file}
     echo
 done
+
+# Cleanup
+rm "${VERSION}.txt"
 
 exit 0

@@ -3,6 +3,7 @@ package cmds
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -38,7 +39,7 @@ func updateRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 	log.Println("yellow", "Bowery is out of date. Updating to", ver, "now...")
 
-	newVer, err := api.DownloadNewVersion(ver)
+	newVer, releaseNotes, err := api.DownloadNewVersion(ver)
 	if err != nil {
 		rollbar.Report(err)
 		return 1
@@ -95,5 +96,14 @@ func updateRun(keen *keen.Client, rollbar *rollbar.Client, args ...string) int {
 	}
 
 	log.Println("magenta", "Updated bowery to version", ver+".")
+
+	if notes, err := ioutil.ReadAll(releaseNotes); err != nil {
+		log.Println("", string(notes))
+		return 0
+	} else {
+		rollbar.Report(err)
+		return 1
+	}
+
 	return 0
 }
