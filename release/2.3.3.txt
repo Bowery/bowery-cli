@@ -1,0 +1,3 @@
+- Support for custom environmental variables. Just add `"env": {"key": "value"}`
+  to your bowery.json file within a given service.
+- Bug fixes

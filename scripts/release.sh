@@ -30,12 +30,20 @@ trap "kill 0" SIGINT SIGTERM EXIT
 # Make sure goxc is installed
 go get github.com/laher/goxc
 
+# Make sure release notes have been written
+releaseNotes="release/${VERSION}.txt"
+if [ ! -e $releaseNotes ]; then
+  echo "Must include release notes at ${DIR}/${releaseNotes}"
+  exit 1
+fi
+
 # This function builds whatever directory we're in...
 goxc \
     -arch="$XC_ARCH" \
     -os="$XC_OS" \
     -d="${DIR}/pkg" \
     -pv="${VERSION}" \
+    -resources-include="release/${VERSION}.txt" \
     $XC_OPTS \
     go-install \
     xc
